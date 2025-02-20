@@ -55,13 +55,17 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('user-message').classList.add('success');
             document.getElementById('create-user-form').reset();
         } catch (error) {
-            document.getElementById('user-message').textContent = error.response?.data?.detail || 'Ошибка создания пользователя';
+            const errorDetail = error.response?.data?.detail;
+            document.getElementById('user-message').textContent = Array.isArray(errorDetail)
+                ? errorDetail.map(err => `${err.loc.join('.')}: ${err.msg}`).join(', ')
+                : errorDetail || 'Ошибка создания пользователя';
             document.getElementById('user-message').classList.add('error');
         }
     });
 
     document.getElementById('create-client-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+        const connectionDate = document.getElementById('client-connection-date').value;
         const clientData = {
             account_number: document.getElementById('client-account-number').value,
             owner_name: document.getElementById('client-owner-name').value,
@@ -72,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
             connected_power: parseFloat(document.getElementById('client-connected-power').value) || null,
             passport_data: document.getElementById('client-passport-data').value || null,
             snils: document.getElementById('client-snils').value || null,
-            connection_date: document.getElementById('client-connection-date').value || null,
+            connection_date: connectionDate ? new Date(connectionDate).toISOString().split('T')[0] : null,
             power_source: document.getElementById('client-power-source').value || null,
             additional_info: document.getElementById('client-additional-info').value || null
         };
@@ -86,7 +90,31 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('create-client-form').reset();
             loadClients();
         } catch (error) {
-            document.getElementById('client-message').textContent = error.response?.data?.detail || 'Ошибка создания клиента';
+            const errorDetail = error.response?.data?.detail;
+            if (Array.isArray(errorDetail)) {
+                const errorMessages = errorDetail.map(err => {
+                    const field = err.loc[err.loc.length - 1];
+                    const msg = err.msg;
+                    const requirements = {
+                        account_number: 'От 1 до 50 символов',
+                        owner_name: 'От 1 до 100 символов',
+                        email: 'Корректный email',
+                        phone_number: 'От 5 до 20 символов',
+                        inn: 'От 10 до 12 символов',
+                        postal_address: 'От 5 до 200 символов',
+                        connected_power: 'Число (опционально)',
+                        passport_data: 'До 50 символов (опционально)',
+                        snils: 'До 12 символов (опционально)',
+                        connection_date: 'Формат ГГГГ-ММ-ДД (опционально)',
+                        power_source: 'До 100 символов (опционально)',
+                        additional_info: 'До 500 символов (опционально)'
+                    };
+                    return `${field}: ${msg} (Требование: ${requirements[field] || 'Неизвестно'})`;
+                });
+                document.getElementById('client-message').textContent = errorMessages.join(', ');
+            } else {
+                document.getElementById('client-message').textContent = errorDetail || 'Ошибка создания клиента';
+            }
             document.getElementById('client-message').classList.add('error');
         }
     });
@@ -116,7 +144,7 @@ function showManagementSection() {
 
 async function fetchCurrentUser() {
     try {
-        const response = await axios.get(`${API_URL}/users/me`, { // Предполагаем, что такой эндпоинт будет добавлен
+        const response = await axios.get(`${API_URL}/users/me`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         currentUsername = response.data.username;

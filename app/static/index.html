@@ -12,60 +12,106 @@
             <h1>Система учета клиентов</h1>
         </header>
 
-        <!-- Блок авторизации -->
         <section id="auth-section" class="card">
             <h2>Вход</h2>
             <form id="login-form" class="form">
-                <input type="email" id="login-email" placeholder="Email" required>
-                <input type="password" id="login-password" placeholder="Пароль" required>
+                <div class="form-group">
+                    <input type="email" id="login-email" placeholder="Email" required>
+                    <span class="tooltip">Введите корректный email</span>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="login-password" placeholder="Пароль" required>
+                    <span class="tooltip">Минимум 8 символов</span>
+                </div>
                 <button type="submit">Войти</button>
             </form>
             <p id="auth-message" class="message"></p>
         </section>
 
-        <!-- Блок управления -->
         <section id="management-section" class="management" style="display: none;">
             <div class="header-actions">
                 <span id="current-user"></span>
                 <button id="logout-btn" class="btn-danger">Выйти</button>
             </div>
 
-            <!-- Создание пользователя -->
             <div class="card">
                 <h2>Создать пользователя</h2>
                 <form id="create-user-form" class="form">
-                    <input type="email" id="user-email" placeholder="Email" required>
-                    <input type="text" id="user-username" placeholder="Имя пользователя" required>
-                    <input type="password" id="user-password" placeholder="Пароль" required>
+                    <div class="form-group">
+                        <input type="email" id="user-email" placeholder="Email" required>
+                        <span class="tooltip">Корректный email</span>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="user-username" placeholder="Имя пользователя" required>
+                        <span class="tooltip">От 3 до 50 символов</span>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="user-password" placeholder="Пароль" required>
+                        <span class="tooltip">Минимум 8 символов</span>
+                    </div>
                     <button type="submit">Создать</button>
                 </form>
                 <p id="user-message" class="message"></p>
             </div>
 
-            <!-- Создание клиента -->
             <div class="card">
                 <h2>Создать клиента</h2>
                 <form id="create-client-form" class="form">
                     <div class="form-grid">
-                        <input type="text" id="client-account-number" placeholder="Номер счета" required>
-                        <input type="text" id="client-owner-name" placeholder="Имя владельца" required>
-                        <input type="email" id="client-email" placeholder="Email" required>
-                        <input type="text" id="client-phone-number" placeholder="Телефон" required>
-                        <input type="text" id="client-inn" placeholder="ИНН" required>
-                        <input type="text" id="client-postal-address" placeholder="Почтовый адрес" required>
-                        <input type="number" id="client-connected-power" placeholder="Подключенная мощность" step="0.1">
-                        <input type="text" id="client-passport-data" placeholder="Паспортные данные">
-                        <input type="text" id="client-snils" placeholder="СНИЛС">
-                        <input type="date" id="client-connection-date" placeholder="Дата подключения">
-                        <input type="text" id="client-power-source" placeholder="Источник питания">
-                        <input type="text" id="client-additional-info" placeholder="Дополнительная информация">
+                        <div class="form-group">
+                            <input type="text" id="client-account-number" placeholder="Номер счета" required>
+                            <span class="tooltip">От 1 до 50 символов</span>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="client-owner-name" placeholder="Имя владельца" required>
+                            <span class="tooltip">От 1 до 100 символов</span>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" id="client-email" placeholder="Email" required>
+                            <span class="tooltip">Корректный email</span>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="client-phone-number" placeholder="Телефон" required>
+                            <span class="tooltip">От 5 до 20 символов</span>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="client-inn" placeholder="ИНН" required>
+                            <span class="tooltip">От 10 до 12 символов</span>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="client-postal-address" placeholder="Почтовый адрес" required>
+                            <span class="tooltip">От 5 до 200 символов</span>
+                        </div>
+                        <div class="form-group">
+                            <input type="number" id="client-connected-power" placeholder="Подключенная мощность" step="0.1">
+                            <span class="tooltip">Число (опционально)</span>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="client-passport-data" placeholder="Паспортные данные">
+                            <span class="tooltip">До 50 символов (опционально)</span>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="client-snils" placeholder="СНИЛС">
+                            <span class="tooltip">До 12 символов (опционально)</span>
+                        </div>
+                        <div class="form-group">
+                            <input type="date" id="client-connection-date" placeholder="Дата подключения">
+                            <span class="tooltip">Формат ГГГГ-ММ-ДД (опционально)</span>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="client-power-source" placeholder="Источник питания">
+                            <span class="tooltip">До 100 символов (опционально)</span>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="client-additional-info" placeholder="Дополнительная информация">
+                            <span class="tooltip">До 500 символов (опционально)</span>
+                        </div>
                     </div>
                     <button type="submit">Создать</button>
                 </form>
                 <p id="client-message" class="message"></p>
             </div>
 
-            <!-- Поиск и список клиентов -->
             <div class="card">
                 <h2>Клиенты</h2>
                 <div class="search-bar">
