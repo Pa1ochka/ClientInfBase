@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система учета клиентов</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Система учета клиентов</h1>
+        </header>
+
+        <!-- Блок авторизации -->
+        <section id="auth-section" class="card">
+            <h2>Вход</h2>
+            <form id="login-form" class="form">
+                <input type="email" id="login-email" placeholder="Email" required>
+                <input type="password" id="login-password" placeholder="Пароль" required>
+                <button type="submit">Войти</button>
+            </form>
+            <p id="auth-message" class="message"></p>
+        </section>
+
+        <!-- Блок управления -->
+        <section id="management-section" class="management" style="display: none;">
+            <div class="header-actions">
+                <span id="current-user"></span>
+                <button id="logout-btn" class="btn-danger">Выйти</button>
+            </div>
+
+            <!-- Создание пользователя -->
+            <div class="card">
+                <h2>Создать пользователя</h2>
+                <form id="create-user-form" class="form">
+                    <input type="email" id="user-email" placeholder="Email" required>
+                    <input type="text" id="user-username" placeholder="Имя пользователя" required>
+                    <input type="password" id="user-password" placeholder="Пароль" required>
+                    <button type="submit">Создать</button>
+                </form>
+                <p id="user-message" class="message"></p>
+            </div>
+
+            <!-- Создание клиента -->
+            <div class="card">
+                <h2>Создать клиента</h2>
+                <form id="create-client-form" class="form">
+                    <div class="form-grid">
+                        <input type="text" id="client-account-number" placeholder="Номер счета" required>
+                        <input type="text" id="client-owner-name" placeholder="Имя владельца" required>
+                        <input type="email" id="client-email" placeholder="Email" required>
+                        <input type="text" id="client-phone-number" placeholder="Телефон" required>
+                        <input type="text" id="client-inn" placeholder="ИНН" required>
+                        <input type="text" id="client-postal-address" placeholder="Почтовый адрес" required>
+                        <input type="number" id="client-connected-power" placeholder="Подключенная мощность" step="0.1">
+                        <input type="text" id="client-passport-data" placeholder="Паспортные данные">
+                        <input type="text" id="client-snils" placeholder="СНИЛС">
+                        <input type="date" id="client-connection-date" placeholder="Дата подключения">
+                        <input type="text" id="client-power-source" placeholder="Источник питания">
+                        <input type="text" id="client-additional-info" placeholder="Дополнительная информация">
+                    </div>
+                    <button type="submit">Создать</button>
+                </form>
+                <p id="client-message" class="message"></p>
+            </div>
+
+            <!-- Поиск и список клиентов -->
+            <div class="card">
+                <h2>Клиенты</h2>
+                <div class="search-bar">
+                    <input type="text" id="search-term" placeholder="Поиск клиентов...">
+                    <button id="search-btn" class="btn-search">Искать</button>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Номер счета</th>
+                                <th>Имя владельца</th>
+                                <th>Email</th>
+                                <th>Телефон</th>
+                                <th>ИНН</th>
+                                <th>Адрес</th>
+                                <th>Мощность</th>
+                                <th>Паспорт</th>
+                                <th>СНИЛС</th>
+                                <th>Дата подключения</th>
+                                <th>Источник питания</th>
+                                <th>Доп. инфо</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clients-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="scripts.js"></script>
+</body>
+</html>

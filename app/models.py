@@ -1,40 +1,46 @@
 # 4. models.py
 from sqlalchemy import Column, Integer, String, Date, Float, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
-from .database import Base
-from .security import verify_password, pwd_context
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()
 
 
 class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True)
-    username = Column(String, unique=True, index=True)
-    hashed_password = Column(String)
-    is_admin = Column(Boolean, default=False)
+    email = Column(String, unique=True, index=True, nullable=False)
+    username = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    is_admin = Column(Boolean, default=False)  # Заменяем role на is_admin как в вашем коде
     is_active = Column(Boolean, default=True)
 
-    def verify_password(self, password: str):
-        return verify_password(password, self.hashed_password)
+    clients = relationship("Client", back_populates="creator")
+
+    def __repr__(self):
+        return f"<User(email='{self.email}', username='{self.username}', is_admin={self.is_admin})>"
 
 
 class Client(Base):
     __tablename__ = "clients"
 
     id = Column(Integer, primary_key=True, index=True)
-    account_number = Column(String, unique=True, index=True)
-    postal_address = Column(String)
-    owner_name = Column(String, index=True)
-    phone_number = Column(String)
-    email = Column(String, index=True)
-    connected_power = Column(Float)
-    passport_data = Column(String)
-    inn = Column(String, index=True)
-    snils = Column(String)
-    connection_date = Column(Date)
-    power_source = Column(String)
-    additional_info = Column(String)
-    created_by = Column(Integer, ForeignKey("users.id"))
+    account_number = Column(String, unique=True, index=True, nullable=False)
+    postal_address = Column(String, nullable=False)
+    owner_name = Column(String, index=True, nullable=False)
+    phone_number = Column(String, nullable=False)
+    email = Column(String, index=True, nullable=False)
+    connected_power = Column(Float, nullable=True)
+    passport_data = Column(String, nullable=True)
+    inn = Column(String, index=True, nullable=False)
+    snils = Column(String, nullable=True)
+    connection_date = Column(Date, nullable=True)
+    power_source = Column(String, nullable=True)
+    additional_info = Column(String, nullable=True)
+    created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
 
-    creator = relationship("User")
+    creator = relationship("User", back_populates="clients")
+
+    def __repr__(self):
+        return f"<Client(account_number='{self.account_number}', owner_name='{self.owner_name}')>"
