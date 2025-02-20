@@ -9,10 +9,11 @@ from .config import settings
 from datetime import timedelta
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
 
 app = FastAPI(title="Система учета клиентов")
 
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -83,7 +84,14 @@ def read_clients(
     current_user: models.User = Depends(get_current_user)
 ):
     print(f"User {current_user.username} requested client list")
-    return crud.get_clients(db, skip, limit)
+    try:
+        clients = crud.get_clients(db, skip, limit)
+        return clients
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"detail": f"Ошибка загрузки списка клиентов: {str(e)}"}
+        )
 
 @app.get("/clients/{account_number}", response_model=schemas.Client)
 def read_client(

@@ -1,4 +1,3 @@
-# 6. crud.py
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from typing import Optional, List
@@ -7,7 +6,6 @@ from . import models, schemas
 from .security import get_password_hash
 
 
-# Проверка прав администратора
 def check_admin_privileges(current_user: models.User) -> None:
     """Проверка, является ли пользователь администратором."""
     if not current_user.is_admin:

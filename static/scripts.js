@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const requirements = {
                         account_number: 'От 1 до 50 символов',
                         owner_name: 'От 1 до 100 символов',
-                        email: 'Корректный email',
+                        email: 'Корректный email (должен содержать @)',
                         phone_number: 'От 5 до 20 символов',
                         inn: 'От 10 до 12 символов',
                         postal_address: 'От 5 до 200 символов',
@@ -164,6 +164,12 @@ async function loadClients(searchTerm = '') {
         const tableBody = document.getElementById('clients-table-body');
         tableBody.innerHTML = '';
 
+        if (!Array.isArray(clients)) {
+            document.getElementById('client-message').textContent = clients.detail || 'Ошибка загрузки списка клиентов';
+            document.getElementById('client-message').classList.add('error');
+            return;
+        }
+
         clients.forEach(client => {
             const row = document.createElement('tr');
             row.innerHTML = `
@@ -185,5 +191,7 @@ async function loadClients(searchTerm = '') {
         });
     } catch (error) {
         console.error('Ошибка загрузки клиентов:', error.response?.data?.detail || error.message);
+        document.getElementById('client-message').textContent = error.response?.data?.detail || 'Ошибка загрузки списка клиентов';
+        document.getElementById('client-message').classList.add('error');
     }
 }
