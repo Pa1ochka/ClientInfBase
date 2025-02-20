@@ -1,17 +1,13 @@
+# 2. database.py
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from .config import settings
 
-# Подключение к базе данных
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:admin12345@localhost/Client_Inf_Base"
-
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(settings.DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-# Базовый класс для создания моделей
 Base = declarative_base()
 
-# Функция для получения сессии
 def get_db():
     db = SessionLocal()
     try:
