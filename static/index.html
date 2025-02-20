@@ -5,125 +5,144 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Система учета клиентов</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Система учета клиентов</h1>
+        <header class="header">
+            <h1><span class="material-icons">business_center</span> Система учета клиентов</h1>
         </header>
 
-        <section id="auth-section" class="card">
-            <h2>Вход</h2>
-            <form id="login-form" class="form">
-                <div class="form-group">
-                    <input type="email" id="login-email" placeholder="Email" required>
-                    <span class="tooltip">Введите корректный email</span>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="login-password" placeholder="Пароль" required>
-                    <span class="tooltip">Минимум 8 символов</span>
-                </div>
-                <button type="submit">Войти</button>
-            </form>
-            <p id="auth-message" class="message"></p>
+        <section id="auth-section" class="auth-card">
+            <div class="card-content">
+                <h2><span class="material-icons">lock</span> Вход</h2>
+                <form id="login-form" class="form">
+                    <div class="input-group">
+                        <span class="material-icons">email</span>
+                        <input type="email" id="login-email" placeholder="Email" required>
+                    </div>
+                    <div class="input-group">
+                        <span class="material-icons">vpn_key</span>
+                        <input type="password" id="login-password" placeholder="Пароль" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><span class="material-icons">login</span> Войти</button>
+                </form>
+                <p id="auth-message" class="message"></p>
+            </div>
         </section>
 
         <section id="management-section" class="management" style="display: none;">
-            <div class="header-actions">
-                <span id="current-user"></span>
-                <button id="logout-btn" class="btn-danger">Выйти</button>
+            <div class="top-bar">
+                <span id="current-user" class="user-info"><span class="material-icons">person</span> Пользователь: Неизвестно</span>
+                <button id="logout-btn" class="btn btn-danger"><span class="material-icons">logout</span> Выйти</button>
             </div>
 
             <div class="card">
-                <h2>Создать пользователя</h2>
-                <form id="create-user-form" class="form">
-                    <div class="form-group">
+                <h2><span class="material-icons">person_add</span> Создать пользователя</h2>
+                <form id="create-user-form" class="form grid-form">
+                    <div class="input-group">
+                        <span class="material-icons">email</span>
                         <input type="email" id="user-email" placeholder="Email" required>
                         <span class="tooltip">Корректный email</span>
                     </div>
-                    <div class="form-group">
+                    <div class="input-group">
+                        <span class="material-icons">person</span>
                         <input type="text" id="user-username" placeholder="Имя пользователя" required>
                         <span class="tooltip">От 3 до 50 символов</span>
                     </div>
-                    <div class="form-group">
+                    <div class="input-group">
+                        <span class="material-icons">lock</span>
                         <input type="password" id="user-password" placeholder="Пароль" required>
                         <span class="tooltip">Минимум 8 символов</span>
                     </div>
-                    <button type="submit">Создать</button>
+                    <button type="submit" class="btn btn-primary"><span class="material-icons">add</span> Создать</button>
                 </form>
                 <p id="user-message" class="message"></p>
             </div>
 
             <div class="card">
-                <h2>Создать клиента</h2>
-                <form id="create-client-form" class="form">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <input type="text" id="client-account-number" placeholder="Номер счета" required>
-                            <span class="tooltip">От 1 до 50 символов</span>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" id="client-owner-name" placeholder="Имя владельца" required>
-                            <span class="tooltip">От 1 до 100 символов</span>
-                        </div>
-                        <div class="form-group">
-                            <input type="email" id="client-email" placeholder="Email" required>
-                            <span class="tooltip">Корректный email</span>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" id="client-phone-number" placeholder="Телефон" required>
-                            <span class="tooltip">От 5 до 20 символов</span>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" id="client-inn" placeholder="ИНН" required>
-                            <span class="tooltip">От 10 до 12 символов</span>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" id="client-postal-address" placeholder="Почтовый адрес" required>
-                            <span class="tooltip">От 5 до 200 символов</span>
-                        </div>
-                        <div class="form-group">
-                            <input type="number" id="client-connected-power" placeholder="Подключенная мощность" step="0.1">
-                            <span class="tooltip">Число (опционально)</span>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" id="client-passport-data" placeholder="Паспортные данные">
-                            <span class="tooltip">До 50 символов (опционально)</span>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" id="client-snils" placeholder="СНИЛС">
-                            <span class="tooltip">До 12 символов (опционально)</span>
-                        </div>
-                        <div class="form-group">
-                            <input type="date" id="client-connection-date" placeholder="Дата подключения">
-                            <span class="tooltip">Формат ГГГГ-ММ-ДД (опционально)</span>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" id="client-power-source" placeholder="Источник питания">
-                            <span class="tooltip">До 100 символов (опционально)</span>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" id="client-additional-info" placeholder="Дополнительная информация">
-                            <span class="tooltip">До 500 символов (опционально)</span>
-                        </div>
+                <h2><span class="material-icons">group_add</span> Создать клиента</h2>
+                <form id="create-client-form" class="form grid-form">
+                    <div class="input-group">
+                        <span class="material-icons">confirmation_number</span>
+                        <input type="text" id="client-account-number" placeholder="Номер счета" required>
+                        <span class="tooltip">От 1 до 50 символов</span>
                     </div>
-                    <button type="submit">Создать</button>
+                    <div class="input-group">
+                        <span class="material-icons">person</span>
+                        <input type="text" id="client-owner-name" placeholder="Имя владельца" required>
+                        <span class="tooltip">От 1 до 100 символов</span>
+                    </div>
+                    <div class="input-group">
+                        <span class="material-icons">email</span>
+                        <input type="email" id="client-email" placeholder="Email" required>
+                        <span class="tooltip">Корректный email</span>
+                    </div>
+                    <div class="input-group">
+                        <span class="material-icons">phone</span>
+                        <input type="text" id="client-phone-number" placeholder="Телефон" required>
+                        <span class="tooltip">От 5 до 20 символов</span>
+                    </div>
+                    <div class="input-group">
+                        <span class="material-icons">fingerprint</span>
+                        <input type="text" id="client-inn" placeholder="ИНН" required>
+                        <span class="tooltip">От 10 до 12 символов</span>
+                    </div>
+                    <div class="input-group">
+                        <span class="material-icons">location_on</span>
+                        <input type="text" id="client-postal-address" placeholder="Почтовый адрес" required>
+                        <span class="tooltip">От 5 до 200 символов</span>
+                    </div>
+                    <div class="input-group">
+                        <span class="material-icons">power</span>
+                        <input type="number" id="client-connected-power" placeholder="Мощность" step="0.1">
+                        <span class="tooltip">Число (опционально)</span>
+                    </div>
+                    <div class="input-group">
+                        <span class="material-icons">badge</span>
+                        <input type="text" id="client-passport-data" placeholder="Паспорт">
+                        <span class="tooltip">До 50 символов (опционально)</span>
+                    </div>
+                    <div class="input-group">
+                        <span class="material-icons">assignment_ind</span>
+                        <input type="text" id="client-snils" placeholder="СНИЛС">
+                        <span class="tooltip">До 12 символов (опционально)</span>
+                    </div>
+                    <div class="input-group">
+                        <span class="material-icons">calendar_today</span>
+                        <input type="date" id="client-connection-date" placeholder="Дата подключения">
+                        <span class="tooltip">ГГГГ-ММ-ДД (опционально)</span>
+                    </div>
+                    <div class="input-group">
+                        <span class="material-icons">power_input</span>
+                        <input type="text" id="client-power-source" placeholder="Источник питания">
+                        <span class="tooltip">До 100 символов (опционально)</span>
+                    </div>
+                    <div class="input-group">
+                        <span class="material-icons">info</span>
+                        <input type="text" id="client-additional-info" placeholder="Доп. информация">
+                        <span class="tooltip">До 500 символов (опционально)</span>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><span class="material-icons">add</span> Создать</button>
                 </form>
                 <p id="client-message" class="message"></p>
             </div>
 
-            <div class="card">
-                <h2>Клиенты</h2>
+            <div class="card clients-card">
+                <h2><span class="material-icons">group</span> Клиенты</h2>
                 <div class="search-bar">
-                    <input type="text" id="search-term" placeholder="Поиск клиентов...">
-                    <button id="search-btn" class="btn-search">Искать</button>
+                    <div class="input-group">
+                        <span class="material-icons">search</span>
+                        <input type="text" id="search-term" placeholder="Поиск клиентов...">
+                    </div>
+                    <button id="search-btn" class="btn btn-success"><span class="material-icons">search</span> Искать</button>
                 </div>
                 <div class="table-wrapper">
                     <table>
                         <thead>
                             <tr>
                                 <th>Номер счета</th>
-                                <th>Имя владельца</th>
+                                <th>Имя</th>
                                 <th>Email</th>
                                 <th>Телефон</th>
                                 <th>ИНН</th>
@@ -131,8 +150,8 @@
                                 <th>Мощность</th>
                                 <th>Паспорт</th>
                                 <th>СНИЛС</th>
-                                <th>Дата подключения</th>
-                                <th>Источник питания</th>
+                                <th>Дата</th>
+                                <th>Источник</th>
                                 <th>Доп. инфо</th>
                                 <th>Действия</th>
                             </tr>
@@ -142,6 +161,78 @@
                 </div>
             </div>
         </section>
+
+        <!-- Модальное окно редактирования -->
+        <div id="edit-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span id="close-modal" class="close">&times;</span>
+                <h2><span class="material-icons">edit</span> Редактировать клиента</h2>
+                <form id="edit-client-form" class="form grid-form">
+                    <div class="input-group">
+                        <span class="material-icons">confirmation_number</span>
+                        <input type="text" id="edit-account-number" placeholder="Номер счета" readonly>
+                        <span class="tooltip">Номер счета (не редактируется)</span>
+                    </div>
+                    <div class="input-group">
+                        <span class="material-icons">person</span>
+                        <input type="text" id="edit-owner-name" placeholder="Имя владельца" required>
+                        <span class="tooltip">От 1 до 100 символов</span>
+                    </div>
+                    <div class="input-group">
+                        <span class="material-icons">email</span>
+                        <input type="email" id="edit-email" placeholder="Email" required>
+                        <span class="tooltip">Корректный email</span>
+                    </div>
+                    <div class="input-group">
+                        <span class="material-icons">phone</span>
+                        <input type="text" id="edit-phone-number" placeholder="Телефон" required>
+                        <span class="tooltip">От 5 до 20 символов</span>
+                    </div>
+                    <div class="input-group">
+                        <span class="material-icons">fingerprint</span>
+                        <input type="text" id="edit-inn" placeholder="ИНН" required>
+                        <span class="tooltip">От 10 до 12 символов</span>
+                    </div>
+                    <div class="input-group">
+                        <span class="material-icons">location_on</span>
+                        <input type="text" id="edit-postal-address" placeholder="Почтовый адрес" required>
+                        <span class="tooltip">От 5 до 200 символов</span>
+                    </div>
+                    <div class="input-group">
+                        <span class="material-icons">power</span>
+                        <input type="number" id="edit-connected-power" placeholder="Мощность" step="0.1">
+                        <span class="tooltip">Число (опционально)</span>
+                    </div>
+                    <div class="input-group">
+                        <span class="material-icons">badge</span>
+                        <input type="text" id="edit-passport-data" placeholder="Паспорт">
+                        <span class="tooltip">До 50 символов (опционально)</span>
+                    </div>
+                    <div class="input-group">
+                        <span class="material-icons">assignment_ind</span>
+                        <input type="text" id="edit-snils" placeholder="СНИЛС">
+                        <span class="tooltip">До 12 символов (опционально)</span>
+                    </div>
+                    <div class="input-group">
+                        <span class="material-icons">calendar_today</span>
+                        <input type="date" id="edit-connection-date" placeholder="Дата подключения">
+                        <span class="tooltip">ГГГГ-ММ-ДД (опционально)</span>
+                    </div>
+                    <div class="input-group">
+                        <span class="material-icons">power_input</span>
+                        <input type="text" id="edit-power-source" placeholder="Источник питания">
+                        <span class="tooltip">До 100 символов (опционально)</span>
+                    </div>
+                    <div class="input-group">
+                        <span class="material-icons">info</span>
+                        <input type="text" id="edit-additional-info" placeholder="Доп. информация">
+                        <span class="tooltip">До 500 символов (опционально)</span>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><span class="material-icons">save</span> Сохранить</button>
+                </form>
+                <p id="edit-message" class="message"></p>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

@@ -123,6 +123,67 @@ document.addEventListener('DOMContentLoaded', () => {
         const searchTerm = document.getElementById('search-term').value;
         await loadClients(searchTerm);
     });
+
+    // Закрытие модального окна
+    document.getElementById('close-modal').addEventListener('click', () => {
+        document.getElementById('edit-modal').style.display = 'none';
+    });
+
+    // Редактирование клиента
+    document.getElementById('edit-client-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const accountNumber = document.getElementById('edit-account-number').value;
+        const connectionDate = document.getElementById('edit-connection-date').value;
+        const clientData = {
+            owner_name: document.getElementById('edit-owner-name').value,
+            email: document.getElementById('edit-email').value,
+            phone_number: document.getElementById('edit-phone-number').value,
+            inn: document.getElementById('edit-inn').value,
+            postal_address: document.getElementById('edit-postal-address').value,
+            connected_power: parseFloat(document.getElementById('edit-connected-power').value) || null,
+            passport_data: document.getElementById('edit-passport-data').value || null,
+            snils: document.getElementById('edit-snils').value || null,
+            connection_date: connectionDate ? new Date(connectionDate).toISOString().split('T')[0] : null,
+            power_source: document.getElementById('edit-power-source').value || null,
+            additional_info: document.getElementById('edit-additional-info').value || null
+        };
+
+        try {
+            const response = await axios.put(`${API_URL}/clients/${accountNumber}`, clientData, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            document.getElementById('edit-message').textContent = 'Клиент обновлён!';
+            document.getElementById('edit-message').classList.add('success');
+            document.getElementById('edit-modal').style.display = 'none';
+            loadClients();
+        } catch (error) {
+            const errorDetail = error.response?.data?.detail;
+            if (Array.isArray(errorDetail)) {
+                const errorMessages = errorDetail.map(err => {
+                    const field = err.loc[err.loc.length - 1];
+                    const msg = err.msg;
+                    const requirements = {
+                        owner_name: 'От 1 до 100 символов',
+                        email: 'Корректный email (должен содержать @)',
+                        phone_number: 'От 5 до 20 символов',
+                        inn: 'От 10 до 12 символов',
+                        postal_address: 'От 5 до 200 символов',
+                        connected_power: 'Число (опционально)',
+                        passport_data: 'До 50 символов (опционально)',
+                        snils: 'До 12 символов (опционально)',
+                        connection_date: 'Формат ГГГГ-ММ-ДД (опционально)',
+                        power_source: 'До 100 символов (опционально)',
+                        additional_info: 'До 500 символов (опционально)'
+                    };
+                    return `${field}: ${msg} (Требование: ${requirements[field] || 'Неизвестно'})`;
+                });
+                document.getElementById('edit-message').textContent = errorMessages.join(', ');
+            } else {
+                document.getElementById('edit-message').textContent = errorDetail || 'Ошибка обновления клиента';
+            }
+            document.getElementById('edit-message').classList.add('error');
+        }
+    });
 });
 
 function checkAuthStatus() {
@@ -185,13 +246,41 @@ async function loadClients(searchTerm = '') {
                 <td>${client.connection_date || '-'}</td>
                 <td>${client.power_source || '-'}</td>
                 <td>${client.additional_info || '-'}</td>
-                <td><button onclick="alert('Редактирование пока не реализовано')">Редактировать</button></td>
+                <td><button onclick="editClient('${client.account_number}')">Редактировать</button></td>
             `;
             tableBody.appendChild(row);
         });
     } catch (error) {
         console.error('Ошибка загрузки клиентов:', error.response?.data?.detail || error.message);
         document.getElementById('client-message').textContent = error.response?.data?.detail || 'Ошибка загрузки списка клиентов';
+        document.getElementById('client-message').classList.add('error');
+    }
+}
+
+async function editClient(accountNumber) {
+    try {
+        const response = await axios.get(`${API_URL}/clients/${accountNumber}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const client = response.data;
+
+        document.getElementById('edit-account-number').value = client.account_number;
+        document.getElementById('edit-owner-name').value = client.owner_name;
+        document.getElementById('edit-email').value = client.email;
+        document.getElementById('edit-phone-number').value = client.phone_number;
+        document.getElementById('edit-inn').value = client.inn;
+        document.getElementById('edit-postal-address').value = client.postal_address;
+        document.getElementById('edit-connected-power').value = client.connected_power || '';
+        document.getElementById('edit-passport-data').value = client.passport_data || '';
+        document.getElementById('edit-snils').value = client.snils || '';
+        document.getElementById('edit-connection-date').value = client.connection_date || '';
+        document.getElementById('edit-power-source').value = client.power_source || '';
+        document.getElementById('edit-additional-info').value = client.additional_info || '';
+
+        document.getElementById('edit-modal').style.display = 'flex';
+    } catch (error) {
+        console.error('Ошибка получения данных клиента:', error.response?.data?.detail || error.message);
+        document.getElementById('client-message').textContent = error.response?.data?.detail || 'Ошибка загрузки данных клиента';
         document.getElementById('client-message').classList.add('error');
     }
 }
