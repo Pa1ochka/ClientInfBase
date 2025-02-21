@@ -1,0 +1,67 @@
+<div id="create-client-section" class="card">
+    <h2><span class="material-icons">group_add</span> Новый клиент</h2>
+    <form id="create-client-form" class="form">
+        <div class="input-group">
+            <input type="text" id="create-client-postal-address" placeholder="Адрес (Город, Улица, Дом)" required>
+            <span class="material-icons">location_on</span>
+            <span class="tooltip">Уникальный адрес, 5-200 символов (Город, Улица, Дом)</span>
+        </div>
+        <div class="input-group">
+            <input type="text" id="create-client-account-number" placeholder="Номер счета" required>
+            <span class="material-icons">confirmation_number</span>
+            <span class="tooltip">От 1 до 50 символов</span>
+        </div>
+        <div class="input-group">
+            <input type="text" id="create-client-owner-name" placeholder="Имя владельца" required>
+            <span class="material-icons">person</span>
+            <span class="tooltip">От 1 до 100 символов</span>
+        </div>
+        <div class="input-group">
+            <input type="email" id="create-client-email" placeholder="Email" required>
+            <span class="material-icons">email</span>
+            <span class="tooltip">Корректный email</span>
+        </div>
+        <div class="input-group">
+            <input type="text" id="create-client-phone-number" placeholder="Телефон" required>
+            <span class="material-icons">phone</span>
+            <span class="tooltip">От 5 до 20 символов</span>
+        </div>
+        <div class="input-group">
+            <input type="text" id="create-client-inn" placeholder="ИНН" required>
+            <span class="material-icons">fingerprint</span>
+            <span class="tooltip">От 10 до 12 символов</span>
+        </div>
+        <div class="input-group">
+            <input type="number" id="create-client-connected-power" placeholder="Мощность" step="0.1">
+            <span class="material-icons">power</span>
+            <span class="tooltip">Число (опционально)</span>
+        </div>
+        <div class="input-group">
+            <input type="text" id="create-client-passport-data" placeholder="Паспорт">
+            <span class="material-icons">badge</span>
+            <span class="tooltip">До 50 символов (опционально)</span>
+        </div>
+        <div class="input-group">
+            <input type="text" id="create-client-snils" placeholder="СНИЛС">
+            <span class="material-icons">assignment_ind</span>
+            <span class="tooltip">До 12 символов (опционально)</span>
+        </div>
+        <div class="input-group">
+            <input type="date" id="create-client-connection-date" placeholder="Дата подключения">
+            <span class="material-icons">calendar_today</span>
+            <span class="tooltip">ГГГГ-ММ-ДД (опционально)</span>
+        </div>
+        <div class="input-group">
+            <input type="text" id="create-client-power-source" placeholder="Источник питания">
+            <span class="material-icons">power_input</span>
+            <span class="tooltip">До 100 символов (опционально)</span>
+        </div>
+        <div class="input-group">
+            <input type="text" id="create-client-additional-info" placeholder="Доп. информация">
+            <span class="material-icons">info</span>
+            <span class="tooltip">До 500 символов (опционально)</span>
+        </div>
+        <button type="submit" class="btn btn-primary">Создать</button>
+    </form>
+    <p id="create-client-message" class="message"></p>
+</div>

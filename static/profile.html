@@ -1,0 +1,31 @@
+<div id="profile-modal" class="modal">
+    <div class="modal-content">
+        <span id="profile-close-modal" class="close">×</span>
+        <h2><span class="material-icons">account_circle</span> Мой профиль</h2>
+        <div id="profile-view">
+            <p><strong>Email:</strong> <span id="profile-view-email"></span></p>
+            <p><strong>Имя пользователя:</strong> <span id="profile-view-username"></span></p>
+            <button id="profile-edit-btn" class="btn btn-primary">Изменить</button>
+        </div>
+        <form id="profile-edit-form" class="form" style="display: none;">
+            <div class="input-group">
+                <input type="email" id="profile-email" placeholder="Email" required>
+                <span class="material-icons">email</span>
+                <span class="tooltip">Корректный email</span>
+            </div>
+            <div class="input-group">
+                <input type="text" id="profile-username" placeholder="Имя пользователя" required>
+                <span class="material-icons">person</span>
+                <span class="tooltip">От 3 до 50 символов</span>
+            </div>
+            <div class="input-group" id="profile-password-group" style="display: none;">
+                <input type="password" id="profile-current-password" placeholder="Текущий пароль" required>
+                <span class="material-icons">lock</span>
+                <span class="tooltip">Введите текущий пароль</span>
+            </div>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <button type="button" id="profile-cancel-btn" class="btn btn-danger">Отмена</button>
+        </form>
+        <p id="profile-message" class="message"></p>
+    </div>
+</div>

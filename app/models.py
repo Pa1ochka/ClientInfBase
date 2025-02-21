@@ -15,6 +15,7 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     is_admin = Column(Boolean, default=False)  # Заменяем role на is_admin как в вашем коде
     is_active = Column(Boolean, default=True)
+    reset_code = Column(String, nullable=True)
 
     clients = relationship("Client", back_populates="creator")
 

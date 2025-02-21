@@ -1,0 +1,121 @@
+#create-client-section.card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
+}
+
+#create-client-section.card:hover {
+    transform: translateY(-5px);
+}
+
+#create-client-section h2 {
+    font-size: 1.6rem;
+    color: #1e2a44;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#create-client-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+#create-client-section .input-group {
+    position: relative;
+}
+
+#create-client-postal-address,
+#create-client-account-number,
+#create-client-owner-name,
+#create-client-email,
+#create-client-phone-number,
+#create-client-inn,
+#create-client-connected-power,
+#create-client-passport-data,
+#create-client-snils,
+#create-client-connection-date,
+#create-client-power-source,
+#create-client-additional-info {
+    width: 100%;
+    padding: 12px 40px 12px 12px;
+    font-size: 16px;
+    border: 1px solid #dfe6e9;
+    border-radius: 8px;
+    background: #f9fafb;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+#create-client-postal-address:focus,
+#create-client-account-number:focus,
+#create-client-owner-name:focus,
+#create-client-email:focus,
+#create-client-phone-number:focus,
+#create-client-inn:focus,
+#create-client-connected-power:focus,
+#create-client-passport-data:focus,
+#create-client-snils:focus,
+#create-client-connection-date:focus,
+#create-client-power-source:focus,
+#create-client-additional-info:focus {
+    outline: none;
+    border-color: #ff6f61;
+    box-shadow: 0 0 8px rgba(255, 111, 97, 0.3);
+}
+
+#create-client-section .input-group .material-icons {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #7f8c8d;
+}
+
+#create-client-section .btn {
+    padding: 12px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #ff6f61;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.3s, transform 0.2s;
+}
+
+#create-client-section .btn:hover {
+    background: #e65b50;
+    transform: scale(1.05);
+}
+
+#create-client-message {
+    margin-top: 15px;
+    font-size: 14px;
+    padding: 10px;
+    border-radius: 5px;
+    background: #f8d7da;
+    color: #721c24;
+}
+
+#create-client-message.success {
+    background: #d4edda;
+    color: #155724;
+}
+
+#create-client-section .tooltip {
+    visibility: hidden;
+    background: #1e2a44;
+    color: #fff;
+    text-align: center;
+    border-radius: 5px;
+    padding: 5px 10px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;

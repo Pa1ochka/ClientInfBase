@@ -3,7 +3,7 @@ from sqlalchemy import or_
 from typing import Optional, List
 from fastapi import HTTPException, status
 from . import models, schemas
-from .security import get_password_hash
+from .security import get_password_hash, verify_password
 
 
 def check_admin_privileges(current_user: models.User) -> None:
@@ -41,12 +41,41 @@ def create_user(db: Session, user: schemas.UserCreate, current_user: models.User
     return db_user
 
 
+def update_user(db: Session, user: schemas.UserUpdate, current_user: models.User) -> models.User:
+    """Обновить профиль текущего пользователя с проверкой текущего пароля."""
+    db_user = db.query(models.User).filter(models.User.id == current_user.id).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Проверка текущего пароля
+    if not verify_password(user.current_password, db_user.hashed_password):
+        raise HTTPException(status_code=400, detail="Incorrect current password")
+
+    # Проверка уникальности email и username, исключая текущего пользователя
+    existing_email = get_user_by_email(db, user.email)
+    if existing_email and existing_email.id != current_user.id:
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    existing_username = db.query(models.User).filter(models.User.username == user.username).first()
+    if existing_username and existing_username.id != current_user.id:
+        raise HTTPException(status_code=400, detail="Username already taken")
+
+    db_user.email = user.email
+    db_user.username = user.username
+    if user.password:  # Обновляем пароль только если указан новый
+        db_user.hashed_password = get_password_hash(user.password)
+
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+
 def create_client(db: Session, client: schemas.ClientCreate, current_user: models.User) -> models.Client:
     """Создать нового клиента (доступно только администратору)."""
     check_admin_privileges(current_user)
-    existing_client = get_client_by_account_number(db, client.account_number)
+    existing_client = get_client_by_address(db, client.postal_address)
     if existing_client:
-        raise HTTPException(status_code=400, detail="Account number already exists")
+        raise HTTPException(status_code=400, detail="Адрес уже существует")
 
     db_client = models.Client(**client.dict(), created_by=current_user.id)
     db.add(db_client)
@@ -60,16 +89,16 @@ def get_clients(db: Session, skip: int = 0, limit: int = 100) -> List[models.Cli
     return db.query(models.Client).offset(skip).limit(limit).all()
 
 
-def get_client_by_account_number(db: Session, account_number: str) -> Optional[models.Client]:
-    """Получить клиента по номеру счета (доступно всем)."""
-    return db.query(models.Client).filter(models.Client.account_number == account_number).first()
+def get_client_by_address(db: Session, postal_address: str) -> Optional[models.Client]:
+    """Получить клиента по адресу (доступно всем)."""
+    return db.query(models.Client).filter(models.Client.postal_address == postal_address).first()
 
 
-def update_client(db: Session, account_number: str, client: schemas.ClientUpdate, current_user: models.User) -> \
+def update_client(db: Session, postal_address: str, client: schemas.ClientUpdate, current_user: models.User) -> \
 Optional[models.Client]:
     """Обновить клиента (доступно только администратору)."""
     check_admin_privileges(current_user)
-    db_client = get_client_by_account_number(db, account_number)
+    db_client = get_client_by_address(db, postal_address)
     if not db_client:
         raise HTTPException(status_code=404, detail="Client not found")
 
@@ -91,12 +120,12 @@ def search_clients(db: Session, search_term: Optional[str] = None, skip: int = 0
             search_pattern = f"%{search_term}%"
             query = query.filter(
                 or_(
+                    models.Client.postal_address.ilike(search_pattern),
                     models.Client.account_number.ilike(search_pattern),
                     models.Client.owner_name.ilike(search_pattern),
                     models.Client.email.ilike(search_pattern),
                     models.Client.phone_number.ilike(search_pattern),
                     models.Client.inn.ilike(search_pattern),
-                    models.Client.postal_address.ilike(search_pattern),
                     models.Client.passport_data.ilike(search_pattern),
                     models.Client.snils.ilike(search_pattern),
                     models.Client.power_source.ilike(search_pattern),

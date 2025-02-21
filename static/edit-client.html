@@ -1,0 +1,70 @@
+<div id="edit-modal" class="modal">
+    <div class="modal-content">
+        <span id="edit-client-close-modal" class="close">×</span>
+        <h2><span class="material-icons">edit</span> Редактировать клиента</h2>
+        <form id="edit-client-form" class="form">
+            <div class="input-group">
+                <input type="text" id="edit-client-postal-address" placeholder="Адрес (Город, Улица, Дом)" readonly>
+                <span class="material-icons">location_on</span>
+                <span class="tooltip">Адрес (не редактируется)</span>
+            </div>
+            <div class="input-group">
+                <input type="text" id="edit-client-account-number" placeholder="Номер счета" required>
+                <span class="material-icons">confirmation_number</span>
+                <span class="tooltip">От 1 до 50 символов</span>
+            </div>
+            <div class="input-group">
+                <input type="text" id="edit-client-owner-name" placeholder="Имя владельца" required>
+                <span class="material-icons">person</span>
+                <span class="tooltip">От 1 до 100 символов</span>
+            </div>
+            <div class="input-group">
+                <input type="email" id="edit-client-email" placeholder="Email" required>
+                <span class="material-icons">email</span>
+                <span class="tooltip">Корректный email</span>
+            </div>
+            <div class="input-group">
+                <input type="text" id="edit-client-phone-number" placeholder="Телефон" required>
+                <span class="material-icons">phone</span>
+                <span class="tooltip">От 5 до 20 символов</span>
+            </div>
+            <div class="input-group">
+                <input type="text" id="edit-client-inn" placeholder="ИНН" required>
+                <span class="material-icons">fingerprint</span>
+                <span class="tooltip">От 10 до 12 символов</span>
+            </div>
+            <div class="input-group">
+                <input type="number" id="edit-client-connected-power" placeholder="Мощность" step="0.1">
+                <span class="material-icons">power</span>
+                <span class="tooltip">Число (опционально)</span>
+            </div>
+            <div class="input-group">
+                <input type="text" id="edit-client-passport-data" placeholder="Паспорт">
+                <span class="material-icons">badge</span>
+                <span class="tooltip">До 50 символов (опционально)</span>
+            </div>
+            <div class="input-group">
+                <input type="text" id="edit-client-snils" placeholder="СНИЛС">
+                <span class="material-icons">assignment_ind</span>
+                <span class="tooltip">До 12 символов (опционально)</span>
+            </div>
+            <div class="input-group">
+                <input type="date" id="edit-client-connection-date" placeholder="Дата подключения">
+                <span class="material-icons">calendar_today</span>
+                <span class="tooltip">ГГГГ-ММ-ДД (опционально)</span>
+            </div>
+            <div class="input-group">
+                <input type="text" id="edit-client-power-source" placeholder="Источник питания">
+                <span class="material-icons">power_input</span>
+                <span class="tooltip">До 100 символов (опционально)</span>
+            </div>
+            <div class="input-group">
+                <input type="text" id="edit-client-additional-info" placeholder="Доп. информация">
+                <span class="material-icons">info</span>
+                <span class="tooltip">До 500 символов (опционально)</span>
+            </div>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+        </form>
+        <p id="edit-client-message" class="message"></p>
+    </div>
+</div>

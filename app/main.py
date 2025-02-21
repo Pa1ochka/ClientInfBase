@@ -4,12 +4,15 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from . import crud, models, schemas
 from .database import engine, get_db
-from .security import create_access_token, verify_password
+from .security import create_access_token, verify_password, get_password_hash
 from .config import settings
 from datetime import timedelta
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
+import secrets
+import smtplib
+from email.mime.text import MIMEText
 
 app = FastAPI(title="Система учета клиентов")
 
@@ -56,9 +59,59 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
+@app.post("/forgot-password")
+async def forgot_password(request: dict, db: Session = Depends(get_db)):
+    email = request.get("email")
+    user = crud.get_user_by_email(db, email)
+    if not user:
+        raise HTTPException(status_code=404, detail="Пользователь с таким email не найден")
+
+    # Генерируем временный код
+    reset_code = secrets.token_hex(8)  # 16 символов случайного кода
+    user.reset_code = reset_code  # Предполагаем, что в модели User есть поле reset_code
+    db.commit()
+
+    # Отправляем email с кодом (пример с Gmail, настройте свои SMTP данные)
+    msg = MIMEText(f"Ваш код для сброса пароля: {reset_code}")
+    msg['Subject'] = 'Сброс пароля'
+    msg['From'] = "your-email@gmail.com"  # Замените на ваш email
+    msg['To'] = email
+
+    with smtplib.SMTP("smtp.gmail.com", 587) as server:
+        server.starttls()
+        server.login("your-email@gmail.com", "your-app-password")  # Используйте пароль приложения Gmail
+        server.send_message(msg)
+
+    return {"message": "Код отправлен на ваш email"}
+
+@app.post("/reset-password")
+async def reset_password(request: dict, db: Session = Depends(get_db)):
+    email = request.get("email")
+    code = request.get("code")
+    new_password = request.get("new_password")
+
+    user = crud.get_user_by_email(db, email)
+    if not user or user.reset_code != code:
+        raise HTTPException(status_code=400, detail="Неверный код или email")
+
+    user.hashed_password = get_password_hash(new_password)
+    user.reset_code = None  # Сбрасываем код после использования
+    db.commit()
+
+    return {"message": "Пароль успешно сброшен"}
+
+# Остальные эндпоинты остаются без изменений
 @app.get("/users/me", response_model=schemas.User)
 def read_current_user(current_user: models.User = Depends(get_current_user)):
     return current_user
+
+@app.put("/users/me", response_model=schemas.User)
+def update_current_user(
+    user: schemas.UserUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    return crud.update_user(db, user, current_user)
 
 @app.post("/users/", response_model=schemas.User)
 def create_user(
@@ -93,26 +146,26 @@ def read_clients(
             content={"detail": f"Ошибка загрузки списка клиентов: {str(e)}"}
         )
 
-@app.get("/clients/{account_number}", response_model=schemas.Client)
+@app.get("/clients/{postal_address}", response_model=schemas.Client)
 def read_client(
-    account_number: str,
+    postal_address: str,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    print(f"User {current_user.username} requested client {account_number}")
-    client = crud.get_client_by_account_number(db, account_number)
+    print(f"User {current_user.username} requested client {postal_address}")
+    client = crud.get_client_by_address(db, postal_address)
     if client is None:
         raise HTTPException(status_code=404, detail="Client not found")
     return client
 
-@app.put("/clients/{account_number}", response_model=schemas.Client)
+@app.put("/clients/{postal_address}", response_model=schemas.Client)
 def update_client(
-    account_number: str,
+    postal_address: str,
     client: schemas.ClientUpdate,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    updated_client = crud.update_client(db, account_number, client, current_user)
+    updated_client = crud.update_client(db, postal_address, client, current_user)
     if updated_client is None:
         raise HTTPException(status_code=404, detail="Client not found")
     return updated_client

@@ -1,0 +1,114 @@
+#create-user-section.card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
+}
+
+#create-user-section.card:hover {
+    transform: translateY(-5px);
+}
+
+#create-user-section h2 {
+    font-size: 1.6rem;
+    color: #1e2a44;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#create-user-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+#create-user-section .input-group {
+    position: relative;
+}
+
+#create-user-email,
+#create-user-username,
+#create-user-password {
+    width: 100%;
+    padding: 12px 40px 12px 12px;
+    font-size: 16px;
+    border: 1px solid #dfe6e9;
+    border-radius: 8px;
+    background: #f9fafb;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+#create-user-email:focus,
+#create-user-username:focus,
+#create-user-password:focus {
+    outline: none;
+    border-color: #ff6f61;
+    box-shadow: 0 0 8px rgba(255, 111, 97, 0.3);
+}
+
+#create-user-section .input-group .material-icons {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #7f8c8d;
+}
+
+#create-user-section .btn {
+    padding: 12px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #ff6f61;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.3s, transform 0.2s;
+}
+
+#create-user-section .btn:hover {
+    background: #e65b50;
+    transform: scale(1.05);
+}
+
+#create-user-message {
+    margin-top: 15px;
+    font-size: 14px;
+    padding: 10px;
+    border-radius: 5px;
+    background: #f8d7da;
+    color: #721c24;
+}
+
+#create-user-message.success {
+    background: #d4edda;
+    color: #155724;
+}
+
+#create-user-section .tooltip {
+    visibility: hidden;
+    background: #1e2a44;
+    color: #fff;
+    text-align: center;
+    border-radius: 5px;
+    padding: 5px 10px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+#create-user-section .input-group:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+}
