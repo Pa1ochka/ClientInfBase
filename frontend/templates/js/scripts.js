@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
     Promise.all(sectionsToLoad.map(section =>
         loadSection(section.fileName, section.container, section.sectionId)
     )).then(() => {
-        // Инициализация всех обработчиков после загрузки секций
         initializeAuthListeners();
         initializeCreateUserListeners();
         initializeCreateClientListeners();
@@ -28,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function loadSection(fileName, containerSelector, sectionId) {
-    return fetch(`${fileName}.html`)
+    return fetch(`/static/${fileName}.html`)
         .then(response => response.text())
         .then(html => {
             const container = document.querySelector(containerSelector);
@@ -36,7 +35,6 @@ function loadSection(fileName, containerSelector, sectionId) {
             tempDiv.innerHTML = html;
             const section = tempDiv.querySelector(`#${sectionId}`);
             if (section) {
-                // Убедимся, что секция добавляется только один раз
                 if (!container.querySelector(`#${sectionId}`)) {
                     section.style.display = sectionId === 'auth-section' ? 'block' : 'none';
                     container.appendChild(section);

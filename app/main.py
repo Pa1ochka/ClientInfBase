@@ -16,12 +16,14 @@ from email.mime.text import MIMEText
 
 app = FastAPI(title="Система учета клиентов")
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# Подключаем статические файлы из папки frontend
+app.mount("/static", StaticFiles(directory="frontend/templates"), name="static")
 
 models.Base.metadata.create_all(bind=engine)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+# Остальной код остаётся без изменений
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
     db: Session = Depends(get_db)
@@ -66,20 +68,18 @@ async def forgot_password(request: dict, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="Пользователь с таким email не найден")
 
-    # Генерируем временный код
-    reset_code = secrets.token_hex(8)  # 16 символов случайного кода
-    user.reset_code = reset_code  # Предполагаем, что в модели User есть поле reset_code
+    reset_code = secrets.token_hex(8)
+    user.reset_code = reset_code
     db.commit()
 
-    # Отправляем email с кодом (пример с Gmail, настройте свои SMTP данные)
     msg = MIMEText(f"Ваш код для сброса пароля: {reset_code}")
     msg['Subject'] = 'Сброс пароля'
-    msg['From'] = "your-email@gmail.com"  # Замените на ваш email
+    msg['From'] = "your-email@gmail.com"
     msg['To'] = email
 
     with smtplib.SMTP("smtp.gmail.com", 587) as server:
         server.starttls()
-        server.login("your-email@gmail.com", "your-app-password")  # Используйте пароль приложения Gmail
+        server.login("your-email@gmail.com", "your-app-password")
         server.send_message(msg)
 
     return {"message": "Код отправлен на ваш email"}
@@ -95,12 +95,11 @@ async def reset_password(request: dict, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Неверный код или email")
 
     user.hashed_password = get_password_hash(new_password)
-    user.reset_code = None  # Сбрасываем код после использования
+    user.reset_code = None
     db.commit()
 
     return {"message": "Пароль успешно сброшен"}
 
-# Остальные эндпоинты остаются без изменений
 @app.get("/users/me", response_model=schemas.User)
 def read_current_user(current_user: models.User = Depends(get_current_user)):
     return current_user
