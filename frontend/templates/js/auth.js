@@ -29,7 +29,6 @@ function initializeAuthListeners() {
         token = null;
         currentUsername = null;
         localStorage.removeItem('token');
-        // Скрываем все секции управления
         const sections = ['create-user-section', 'create-client-section', 'clients-section'];
         sections.forEach(id => {
             const section = document.getElementById(id);
@@ -101,5 +100,23 @@ function initializeAuthListeners() {
             document.getElementById('auth-message').textContent = error.response?.data?.detail || 'Ошибка отправки кода';
             document.getElementById('auth-message').classList.add('error');
         }
+    });
+}
+
+function updateSidebarMenu() {
+    fetch(`${API_URL}/users/me`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    })
+    .then(response => response.json())
+    .then(user => {
+        const isAdmin = user.is_admin;
+        document.getElementById('create-user-btn').style.display = isAdmin ? 'flex' : 'none';
+        document.getElementById('create-client-btn').style.display = isAdmin ? 'flex' : 'none';
+        document.getElementById('clients-btn').style.display = 'flex'; // Всегда видно
+        document.getElementById('profile-btn').style.display = 'flex'; // Всегда видно
+        document.getElementById('logout-btn').style.display = 'flex';  // Всегда видно
+    })
+    .catch(error => {
+        console.error('Ошибка получения данных пользователя:', error);
     });
 }

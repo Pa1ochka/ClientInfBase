@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     Promise.all(sectionsToLoad.map(section =>
-        loadSection(section.fileName, section.container, section.sectionId)
+        loadSection(section.fileName, section.container, section.sectionId) // Исправлено
     )).then(() => {
         initializeAuthListeners();
         initializeCreateUserListeners();
@@ -58,6 +58,13 @@ function checkAuthStatus() {
     } else {
         document.getElementById('auth-section').style.display = 'block';
         document.getElementById('sidebar-nav').style.display = 'none';
+        const sections = ['create-user-section', 'create-client-section', 'clients-section'];
+        sections.forEach(id => {
+            const section = document.getElementById(id);
+            if (section) {
+                section.style.display = 'none';
+            }
+        });
     }
 }
 
@@ -65,6 +72,7 @@ function showManagementSection() {
     document.getElementById('auth-section').style.display = 'none';
     document.getElementById('sidebar-nav').style.display = 'flex';
     document.getElementById('current-user').textContent = `${currentUsername || 'Неизвестно'}`;
+    updateSidebarMenu();
 }
 
 async function fetchCurrentUser() {

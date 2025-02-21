@@ -16,14 +16,12 @@ from email.mime.text import MIMEText
 
 app = FastAPI(title="Система учета клиентов")
 
-# Подключаем статические файлы из папки frontend
 app.mount("/static", StaticFiles(directory="frontend/templates"), name="static")
 
 models.Base.metadata.create_all(bind=engine)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-# Остальной код остаётся без изменений
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
     db: Session = Depends(get_db)
@@ -164,6 +162,8 @@ def update_client(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Только администраторы могут редактировать данные клиентов")
     updated_client = crud.update_client(db, postal_address, client, current_user)
     if updated_client is None:
         raise HTTPException(status_code=404, detail="Client not found")

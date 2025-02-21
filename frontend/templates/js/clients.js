@@ -70,10 +70,12 @@ function initializeClientsListeners() {
 async function loadClients(searchTerm = '') {
     try {
         const url = searchTerm ? `${API_URL}/clients/search/?search=${encodeURIComponent(searchTerm)}` : `${API_URL}/clients/`;
-        const response = await axios.get(url, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const clients = response.data;
+        const [clientsResponse, userResponse] = await Promise.all([
+            axios.get(url, { headers: { 'Authorization': `Bearer ${token}` } }),
+            axios.get(`${API_URL}/users/me`, { headers: { 'Authorization': `Bearer ${token}` } })
+        ]);
+        const clients = clientsResponse.data;
+        const isAdmin = userResponse.data.is_admin;
         const tableBody = document.getElementById('clients-table-body');
         tableBody.innerHTML = '';
 
@@ -98,7 +100,7 @@ async function loadClients(searchTerm = '') {
                 <td>${client.connection_date || '-'}</td>
                 <td>${client.power_source || '-'}</td>
                 <td>${client.additional_info || '-'}</td>
-                <td><button class="btn btn-edit" onclick="editClient('${encodeURIComponent(client.postal_address)}')"><span class="material-icons">edit</span> Редактировать</button></td>
+                <td>${isAdmin ? `<button class="btn btn-edit" onclick="editClient('${encodeURIComponent(client.postal_address)}')"><span class="material-icons">edit</span> Редактировать</button>` : ''}</td>
             `;
             tableBody.appendChild(row);
         });
