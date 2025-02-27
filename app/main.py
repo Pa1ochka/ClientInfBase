@@ -44,6 +44,14 @@ async def get_current_user(
         raise credentials_exception
     return user
 
+from fastapi.responses import FileResponse
+
+@app.get("/")
+async def read_index():
+    return FileResponse("frontend/templates/index.html")
+
+
+
 @app.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = crud.get_user_by_email(db, form_data.username)
