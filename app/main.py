@@ -15,6 +15,7 @@ import smtplib
 from email.mime.text import MIMEText
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 
 app = FastAPI(title="Система учета клиентов")
 
@@ -56,7 +57,6 @@ async def get_current_user(
         raise credentials_exception
     return user
 
-from fastapi.responses import FileResponse
 
 @app.get("/")
 async def read_index():
@@ -201,9 +201,9 @@ def search_clients(
     return crud.search_clients(db, search, skip, limit)
 
 
-from .crud import get_password_hash
-from .database import get_db
-from . import models
+# from .crud import get_password_hash
+# from .database import get_db
+# from . import models
 
 def create_first_admin():
     db = next(get_db())

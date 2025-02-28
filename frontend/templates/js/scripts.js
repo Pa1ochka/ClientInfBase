@@ -1,4 +1,4 @@
-const API_URL = 'http://127.0.0.1:8000';
+const API_URL = 'https://clients.aores.ru';
 let token = null;
 let currentUsername = null;
 
