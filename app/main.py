@@ -13,8 +13,20 @@ from fastapi.responses import JSONResponse
 import secrets
 import smtplib
 from email.mime.text import MIMEText
+from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Система учета клиентов")
+
+
+# Настройка CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://clients.aores.ru"],  # Разрешённый источник
+    allow_credentials=True,
+    allow_methods=["*"],  # Разрешить все методы (GET, POST и т.д.)
+    allow_headers=["*"],  # Разрешить все заголовки
+)
 
 app.mount("/static", StaticFiles(directory="frontend/templates"), name="static")
 
@@ -187,3 +199,29 @@ def search_clients(
 ):
     print(f"User {current_user.username} searched for: {search}")
     return crud.search_clients(db, search, skip, limit)
+
+
+from .crud import get_password_hash
+from .database import get_db
+from . import models
+
+def create_first_admin():
+    db = next(get_db())
+    # Проверяем, есть ли уже пользователи
+    if not db.query(models.User).first():
+        hashed_password = get_password_hash("armen000")
+        admin = models.User(
+            email="ab@aores.ru",
+            username="Armen",
+            hashed_password=hashed_password,
+            is_admin=True,
+            is_active=True
+        )
+        db.add(admin)
+        db.commit()
+        db.refresh(admin)
+        print("Первый администратор создан: admin@example.com / adminpass123")
+    db.close()
+
+# Вызываем функцию при запуске
+#create_first_admin()
