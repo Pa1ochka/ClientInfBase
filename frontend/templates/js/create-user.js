@@ -17,6 +17,7 @@ function initializeCreateUserListeners() {
             document.getElementById('create-user-message').classList.remove('error');
             document.getElementById('create-user-message').classList.add('success');
             document.getElementById('create-user-form').reset();
+            showToast('Пользователь успешно создан', 'success');
         } catch (error) {
             const errorDetail = error.response?.data?.detail;
             document.getElementById('create-user-message').textContent = Array.isArray(errorDetail) 

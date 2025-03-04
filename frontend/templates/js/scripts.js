@@ -1,8 +1,21 @@
-const API_URL = 'https://clients.aores.ru';
+let API_URL;
 let token = null;
 let currentUsername = null;
 
-document.addEventListener('DOMContentLoaded', () => {
+async function loadConfig() {
+    try {
+        const response = await fetch('/config');
+        const config = await response.json();
+        API_URL = config.api_url;
+    } catch (error) {
+        console.error('Ошибка загрузки конфигурации:', error);
+        API_URL = ''; // Используем относительный путь на случай ошибки
+    }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadConfig();
+
     const sectionsToLoad = [
         { fileName: 'auth', container: '#main-content', sectionId: 'auth-section' },
         { fileName: 'create-user', container: '#main-content', sectionId: 'create-user-section' },
@@ -13,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     Promise.all(sectionsToLoad.map(section =>
-        loadSection(section.fileName, section.container, section.sectionId) // Исправлено
+        loadSection(section.fileName, section.container, section.sectionId)
     )).then(() => {
         initializeAuthListeners();
         initializeCreateUserListeners();
@@ -36,7 +49,7 @@ function loadSection(fileName, containerSelector, sectionId) {
             const section = tempDiv.querySelector(`#${sectionId}`);
             if (section) {
                 if (!container.querySelector(`#${sectionId}`)) {
-                    section.style.display = sectionId === 'auth-section' ? 'block' : 'none';
+                    section.style.display = sectionId === 'auth-section' ? 'flex' : 'none';
                     container.appendChild(section);
                 }
             }
@@ -46,24 +59,28 @@ function loadSection(fileName, containerSelector, sectionId) {
 
 function checkAuthStatus() {
     token = localStorage.getItem('token');
+    const authSection = document.getElementById('auth-section');
+    const sidebar = document.getElementById('sidebar-nav');
+
     if (token) {
         fetchCurrentUser().then(() => {
             showManagementSection();
             showSection('clients-section');
+            authSection.style.display = 'none';
         }).catch(() => {
             console.error('Не удалось загрузить данные пользователя при старте');
-            document.getElementById('auth-section').style.display = 'block';
-            document.getElementById('sidebar-nav').style.display = 'none';
+            authSection.style.display = 'flex';
+            setTimeout(() => authSection.classList.add('active'), 10);
+            sidebar.style.display = 'none';
         });
     } else {
-        document.getElementById('auth-section').style.display = 'block';
-        document.getElementById('sidebar-nav').style.display = 'none';
+        authSection.style.display = 'flex';
+        setTimeout(() => authSection.classList.add('active'), 10);
+        sidebar.style.display = 'none';
         const sections = ['create-user-section', 'create-client-section', 'clients-section'];
         sections.forEach(id => {
             const section = document.getElementById(id);
-            if (section) {
-                section.style.display = 'none';
-            }
+            if (section) section.style.display = 'none';
         });
     }
 }
@@ -73,6 +90,29 @@ function showManagementSection() {
     document.getElementById('sidebar-nav').style.display = 'flex';
     document.getElementById('current-user').textContent = `${currentUsername || 'Неизвестно'}`;
     updateSidebarMenu();
+}
+
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+        <span class="material-icons">${type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info'}</span>
+        <p>${message}</p>
+    `;
+
+    const toastContainer = document.getElementById('toast-container');
+    toastContainer.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 10);
+
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            toastContainer.removeChild(toast);
+        }, 300);
+    }, 3000);
 }
 
 async function fetchCurrentUser() {
@@ -88,7 +128,17 @@ function showSection(sectionId) {
     sections.forEach(id => {
         const section = document.getElementById(id);
         if (section) {
-            section.style.display = id === sectionId ? 'block' : 'none';
+            if (id === sectionId) {
+                section.style.display = 'block';
+                setTimeout(() => {
+                    section.classList.add('active');
+                }, 10);
+            } else {
+                section.classList.remove('active');
+                setTimeout(() => {
+                    section.style.display = 'none';
+                }, 300);
+            }
         }
     });
     const buttons = ['create-user-btn', 'create-client-btn', 'clients-btn'];
@@ -97,5 +147,23 @@ function showSection(sectionId) {
         if (button) {
             button.classList.toggle('active', id === `${sectionId.replace('-section', '-btn')}`);
         }
+    });
+}
+
+function updateSidebarMenu() {
+    fetch(`${API_URL}/users/me`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    })
+    .then(response => response.json())
+    .then(user => {
+        const isAdmin = user.is_admin;
+        document.getElementById('create-user-btn').style.display = isAdmin ? 'flex' : 'none';
+        document.getElementById('create-client-btn').style.display = isAdmin ? 'flex' : 'none';
+        document.getElementById('clients-btn').style.display = 'flex';
+        document.getElementById('profile-btn').style.display = 'flex';
+        document.getElementById('logout-btn').style.display = 'flex';
+    })
+    .catch(error => {
+        console.error('Ошибка получения данных пользователя:', error);
     });
 }

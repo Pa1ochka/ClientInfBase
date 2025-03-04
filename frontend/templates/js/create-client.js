@@ -35,6 +35,7 @@ function initializeCreateClientListeners() {
             document.getElementById('create-client-message').classList.add('success');
             document.getElementById('create-client-form').reset();
             loadClients();
+            showToast('Клиент успешно создан', 'success');
         } catch (error) {
             const errorDetail = error.response?.data?.detail;
             if (Array.isArray(errorDetail)) {

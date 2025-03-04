@@ -7,7 +7,11 @@ function initializeClientsListeners() {
     });
 
     document.getElementById('edit-client-close-modal').addEventListener('click', () => {
-        document.getElementById('edit-modal').style.display = 'none';
+        const editModal = document.getElementById('edit-modal');
+        editModal.classList.remove('active');
+        setTimeout(() => {
+            editModal.style.display = 'none';
+        }, 300);
     });
 
     document.getElementById('edit-client-form').addEventListener('submit', async (e) => {
@@ -37,6 +41,7 @@ function initializeClientsListeners() {
             document.getElementById('edit-client-message').classList.add('success');
             document.getElementById('edit-modal').style.display = 'none';
             loadClients();
+            showToast('Клиент успешно обновлён', 'success');
         } catch (error) {
             const errorDetail = error.response?.data?.detail;
             if (Array.isArray(errorDetail)) {
@@ -89,18 +94,14 @@ async function loadClients(searchTerm = '') {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${client.postal_address}</td>
-                <td>${client.account_number}</td>
                 <td>${client.owner_name}</td>
                 <td>${client.email}</td>
                 <td>${client.phone_number}</td>
                 <td>${client.inn}</td>
-                <td>${client.connected_power || '-'}</td>
-                <td>${client.passport_data || '-'}</td>
-                <td>${client.snils || '-'}</td>
-                <td>${client.connection_date || '-'}</td>
-                <td>${client.power_source || '-'}</td>
-                <td>${client.additional_info || '-'}</td>
-                <td>${isAdmin ? `<button class="btn btn-edit" onclick="editClient('${encodeURIComponent(client.postal_address)}')"><span class="material-icons">edit</span> Редактировать</button>` : ''}</td>
+                <td>
+                    ${isAdmin ? `<button class="btn btn-edit" onclick="editClient('${encodeURIComponent(client.postal_address)}')"><span class="material-icons">edit</span></button>` : ''}
+                    <button class="btn btn-secondary" onclick="showClientDetails('${encodeURIComponent(client.postal_address)}')"><span class="material-icons">info</span></button>
+                </td>
             `;
             tableBody.appendChild(row);
         });
@@ -131,10 +132,60 @@ async function editClient(postalAddress) {
         document.getElementById('edit-client-power-source').value = client.power_source || '';
         document.getElementById('edit-client-additional-info').value = client.additional_info || '';
 
-        document.getElementById('edit-modal').style.display = 'flex';
+        const editModal = document.getElementById('edit-modal');
+        editModal.style.display = 'flex';
+        setTimeout(() => {
+            editModal.classList.add('active');
+        }, 10);
     } catch (error) {
         console.error('Ошибка получения данных клиента:', error.response?.data?.detail || error.message);
         document.getElementById('create-client-message').textContent = error.response?.data?.detail || 'Ошибка загрузки данных клиента';
         document.getElementById('create-client-message').classList.add('error');
+    }
+}
+
+async function showClientDetails(postalAddress) {
+    try {
+        console.log('Fetching client details for:', postalAddress);
+        const response = await axios.get(`${API_URL}/clients/${postalAddress}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const client = response.data;
+        console.log('Client data received:', client);
+
+        const modal = document.createElement('div');
+        modal.className = 'client-details-modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <button class="close" onclick="this.parentElement.parentElement.remove()" aria-label="Закрыть">×</button>
+                <header>
+                    <h2><span class="material-icons">person</span> ${client.owner_name || 'Без имени'}</h2>
+                </header>
+                <div class="client-details">
+                    <p><strong>Адрес:</strong> ${client.postal_address || '-'}</p>
+                    <p><strong>Номер счета:</strong> ${client.account_number || '-'}</p>
+                    <p><strong>Email:</strong> ${client.email || '-'}</p>
+                    <p><strong>Телефон:</strong> ${client.phone_number || '-'}</p>
+                    <p><strong>ИНН:</strong> ${client.inn || '-'}</p>
+                    <p><strong>Мощность:</strong> ${client.connected_power !== null ? client.connected_power : '-'}</p>
+                    <p><strong>Паспорт:</strong> ${client.passport_data || '-'}</p>
+                    <p><strong>СНИЛС:</strong> ${client.snils || '-'}</p>
+                    <p><strong>Дата подключения:</strong> ${client.connection_date ? new Date(client.connection_date).toLocaleDateString() : '-'}</p>
+                    <p><strong>Источник питания:</strong> ${client.power_source || '-'}</p>
+                    <p><strong>Дополнительно:</strong> ${client.additional_info || '-'}</p>
+                    <p><strong>Создан пользователем (ID):</strong> ${client.created_by || '-'}</p>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+        console.log('Modal appended to DOM:', modal);
+        setTimeout(() => {
+            modal.classList.add('active');
+            console.log('Modal class "active" added:', modal.classList);
+        }, 10);
+    } catch (error) {
+        console.error('Ошибка в showClientDetails:', error);
+        showToast(`Ошибка загрузки данных клиента: ${error.response?.data?.detail || error.message}`, 'error');
     }
 }

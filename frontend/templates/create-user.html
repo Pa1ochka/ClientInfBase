@@ -1,5 +1,7 @@
-<div id="create-user-section" class="card">
-    <h2><span class="material-icons">person_add</span> Новый пользователь</h2>
+<section id="create-user-section" class="card">
+    <header>
+        <h2><span class="material-icons">person_add</span> Новый пользователь</h2>
+    </header>
     <form id="create-user-form" class="form">
         <div class="input-group">
             <input type="email" id="create-user-email" placeholder="Email" required>
@@ -16,7 +18,9 @@
             <span class="material-icons">lock</span>
             <span class="tooltip">Минимум 8 символов</span>
         </div>
-        <button type="submit" class="btn btn-primary">Создать</button>
+        <button type="submit" class="btn btn-primary">
+            <span class="material-icons">add_circle</span> Создать пользователя
+        </button>
     </form>
-    <p id="create-user-message" class="message"></p>
-</div>
+    <div id="create-user-message" class="message"></div>
+</section>

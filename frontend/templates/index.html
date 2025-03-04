@@ -10,27 +10,46 @@
     <link rel="stylesheet" href="/static/css/create-client.css">
     <link rel="stylesheet" href="/static/css/clients.css">
     <link rel="stylesheet" href="/static/css/profile.css">
+    <link rel="stylesheet" href="/static/css/animations.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/static/img/favicon.png">
 </head>
 <body>
     <div class="app">
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <h1><span class="material-icons">business_center</span> Клиенты</h1>
+            <header class="sidebar-header">
+                <h1><span class="material-icons">business_center</span> ClientInfBase</h1>
                 <span id="current-user" class="user-info"></span>
-            </div>
+            </header>
             <nav class="sidebar-nav" id="sidebar-nav" style="display: none;">
-                <button id="profile-btn" class="nav-btn"><span class="material-icons">account_circle</span> Профиль</button>
-                <button id="create-user-btn" class="nav-btn"><span class="material-icons">person_add</span> Новый пользователь</button>
-                <button id="create-client-btn" class="nav-btn"><span class="material-icons">group_add</span> Новый клиент</button>
-                <button id="clients-btn" class="nav-btn"><span class="material-icons">group</span> Список клиентов</button>
-                <button id="logout-btn" class="nav-btn logout"><span class="material-icons">logout</span> Выйти</button>
+                <button id="profile-btn" class="nav-btn">
+                    <span class="material-icons">account_circle</span> Профиль
+                </button>
+                <button id="create-user-btn" class="nav-btn">
+                    <span class="material-icons">person_add</span> Новый пользователь
+                </button>
+                <button id="create-client-btn" class="nav-btn">
+                    <span class="material-icons">group_add</span> Новый клиент
+                </button>
+                <button id="clients-btn" class="nav-btn">
+                    <span class="material-icons">group</span> Список клиентов
+                </button>
+                <button id="logout-btn" class="nav-btn logout">
+                    <span class="material-icons">logout</span> Выйти
+                </button>
             </nav>
         </aside>
-        <main class="main-content" id="main-content"></main>
-        <div id="modal-container"></div>
+        <main class="main-content" id="main-content">
+            <!-- Секции загружаются динамически через JS -->
+        </main>
+        <div id="modal-container">
+            <!-- Модальные окна загружаются динамически -->
+        </div>
+        <div id="toast-container"></div>
     </div>
+
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/static/js/scripts.js"></script>
     <script src="/static/js/auth.js"></script>

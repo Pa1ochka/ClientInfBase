@@ -1,7 +1,9 @@
 <div id="edit-modal" class="modal">
     <div class="modal-content">
-        <span id="edit-client-close-modal" class="close">×</span>
-        <h2><span class="material-icons">edit</span> Редактировать клиента</h2>
+        <button id="edit-client-close-modal" class="close" aria-label="Закрыть">×</button>
+        <header>
+            <h2><span class="material-icons">edit</span> Редактировать клиента</h2>
+        </header>
         <form id="edit-client-form" class="form">
             <div class="input-group">
                 <input type="text" id="edit-client-postal-address" placeholder="Адрес (Город, Улица, Дом)" readonly>
@@ -59,12 +61,12 @@
                 <span class="tooltip">До 100 символов (опционально)</span>
             </div>
             <div class="input-group">
-                <input type="text" id="edit-client-additional-info" placeholder="Доп. информация">
+                <textarea id="edit-client-additional-info" placeholder="Доп. информация" rows="3"></textarea>
                 <span class="material-icons">info</span>
                 <span class="tooltip">До 500 символов (опционально)</span>
             </div>
             <button type="submit" class="btn btn-primary">Сохранить</button>
         </form>
-        <p id="edit-client-message" class="message"></p>
+        <div id="edit-client-message" class="message"></div>
     </div>
 </div>

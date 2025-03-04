@@ -6,86 +6,127 @@ function initializeProfileListeners() {
             });
             const user = response.data;
 
-            // Заполняем данные для просмотра
-            document.getElementById('profile-view-email').textContent = user.email;
+            // Заполнение данных профиля
             document.getElementById('profile-view-username').textContent = user.username;
+            document.getElementById('profile-view-email').textContent = user.email;
+            document.getElementById('profile-view-role').textContent = user.is_admin ? 'Администратор' : 'Пользователь';
+            document.getElementById('profile-view-created').textContent = new Date(user.created_at).toLocaleDateString();
+            document.getElementById('profile-avatar-img').src = user.avatar_url || '/static/img/default-avatar.png';
 
-            // Заполняем поля формы для редактирования
+            // Заполнение формы редактирования
             document.getElementById('profile-email').value = user.email;
             document.getElementById('profile-username').value = user.username;
-            document.getElementById('profile-current-password').value = '';
 
-            // Показываем режим просмотра и скрываем форму
-            document.getElementById('profile-view').style.display = 'block';
-            document.getElementById('profile-edit-form').style.display = 'none';
-
-            document.getElementById('profile-modal').style.display = 'flex';
+            toggleProfileSection('profile-view');
+            showModal('profile-modal');
         } catch (error) {
-            console.error('Ошибка получения профиля:', error.response?.data?.detail || error.message);
-            document.getElementById('profile-message').textContent = error.response?.data?.detail || 'Ошибка загрузки профиля';
-            document.getElementById('profile-message').classList.add('error');
+            showError('profile-message', error);
         }
     });
 
-    document.getElementById('profile-close-modal').addEventListener('click', () => {
-        document.getElementById('profile-modal').style.display = 'none';
-        document.getElementById('profile-message').textContent = '';
-        document.getElementById('profile-message').classList.remove('error', 'success');
+    document.getElementById('profile-close-modal').addEventListener('click', () => hideModal('profile-modal'));
+
+    document.getElementById('profile-edit-btn').addEventListener('click', () => toggleProfileSection('profile-edit-form'));
+    document.getElementById('profile-password-btn').addEventListener('click', () => toggleProfileSection('profile-password-form'));
+
+    document.getElementById('profile-cancel-btn').addEventListener('click', () => toggleProfileSection('profile-view'));
+    document.getElementById('profile-password-cancel-btn').addEventListener('click', () => toggleProfileSection('profile-view'));
+
+    document.getElementById('profile-avatar-edit').addEventListener('click', () => {
+        document.getElementById('profile-avatar-upload').click();
     });
 
-    document.getElementById('profile-edit-btn').addEventListener('click', () => {
-        // Переключаемся в режим редактирования
-        document.getElementById('profile-view').style.display = 'none';
-        document.getElementById('profile-edit-form').style.display = 'block';
-        document.getElementById('profile-password-group').style.display = 'block';
-    });
-
-    document.getElementById('profile-cancel-btn').addEventListener('click', () => {
-        // Возвращаемся в режим просмотра
-        document.getElementById('profile-edit-form').style.display = 'none';
-        document.getElementById('profile-view').style.display = 'block';
-        document.getElementById('profile-message').textContent = '';
-        document.getElementById('profile-message').classList.remove('error', 'success');
+    document.getElementById('profile-avatar-upload').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const formData = new FormData();
+            formData.append('avatar', file);
+            try {
+                const response = await axios.post(`${API_URL}/users/me/avatar`, formData, {
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
+                });
+                document.getElementById('profile-avatar-img').src = response.data.avatar_url;
+                showToast('Аватар обновлен', 'success');
+            } catch (error) {
+                showError('profile-message', error);
+            }
+        }
     });
 
     document.getElementById('profile-edit-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const currentPassword = document.getElementById('profile-current-password').value;
-
         const userData = {
             email: document.getElementById('profile-email').value,
             username: document.getElementById('profile-username').value,
-            current_password: currentPassword
+            current_password: document.getElementById('profile-current-password').value
         };
-
         try {
             const response = await axios.put(`${API_URL}/users/me`, userData, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            document.getElementById('profile-message').textContent = 'Профиль обновлён!';
-            document.getElementById('profile-message').classList.remove('error');
-            document.getElementById('profile-message').classList.add('success');
-            document.getElementById('profile-modal').style.display = 'none';
-            currentUsername = response.data.username;
-            document.getElementById('current-user').textContent = `${currentUsername}`;
+            updateProfileView(response.data);
+            toggleProfileSection('profile-view');
+            showToast('Профиль обновлен', 'success');
         } catch (error) {
-            const errorDetail = error.response?.data?.detail;
-            if (Array.isArray(errorDetail)) {
-                const errorMessages = errorDetail.map(err => {
-                    const field = err.loc[err.loc.length - 1];
-                    const msg = err.msg;
-                    const requirements = {
-                        email: 'Корректный email (должен содержать @)',
-                        username: 'От 3 до 50 символов',
-                        current_password: 'Текущий пароль (обязательно)'
-                    };
-                    return `${field}: ${msg} (Требование: ${requirements[field] || 'Неизвестно'})`;
-                });
-                document.getElementById('profile-message').textContent = errorMessages.join(', ');
-            } else {
-                document.getElementById('profile-message').textContent = errorDetail || 'Ошибка обновления профиля';
-            }
-            document.getElementById('profile-message').classList.add('error');
+            showError('profile-message', error);
         }
     });
+
+    document.getElementById('profile-password-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const oldPassword = document.getElementById('profile-old-password').value;
+        const newPassword = document.getElementById('profile-new-password').value;
+        const confirmPassword = document.getElementById('profile-confirm-password').value;
+
+        if (newPassword !== confirmPassword) {
+            document.getElementById('profile-message').textContent = 'Пароли не совпадают';
+            document.getElementById('profile-message').classList.add('error');
+            return;
+        }
+
+        try {
+            await axios.put(`${API_URL}/users/me/password`, {
+                old_password: oldPassword,
+                new_password: newPassword
+            }, { headers: { 'Authorization': `Bearer ${token}` } });
+            toggleProfileSection('profile-view');
+            showToast('Пароль обновлен', 'success');
+        } catch (error) {
+            showError('profile-message', error);
+        }
+    });
+}
+
+function toggleProfileSection(activeSectionId) {
+    const sections = ['profile-view', 'profile-edit-form', 'profile-password-form'];
+    sections.forEach(id => {
+        const section = document.getElementById(id);
+        section.style.display = id === activeSectionId ? 'block' : 'none';
+    });
+    document.getElementById('profile-message').textContent = '';
+    document.getElementById('profile-message').classList.remove('error', 'success');
+}
+
+function showModal(modalId) {
+    const modal = document.getElementById(modalId);
+    modal.style.display = 'flex';
+    setTimeout(() => modal.classList.add('active'), 10);
+}
+
+function hideModal(modalId) {
+    const modal = document.getElementById(modalId);
+    modal.classList.remove('active');
+    setTimeout(() => modal.style.display = 'none', 300);
+}
+
+function updateProfileView(user) {
+    document.getElementById('profile-view-username').textContent = user.username;
+    document.getElementById('profile-view-email').textContent = user.email;
+    document.getElementById('current-user').textContent = user.username;
+}
+
+function showError(elementId, error) {
+    const message = document.getElementById(elementId);
+    message.textContent = error.response?.data?.detail || 'Ошибка выполнения запроса';
+    message.classList.add('error');
 }

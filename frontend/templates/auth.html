@@ -1,18 +1,31 @@
-<section id="auth-section" class="auth-section">
+<div id="auth-section" class="auth-modal">
     <div class="auth-card">
-        <h2><span class="material-icons">lock</span> Вход</h2>
+        <header class="auth-header">
+            <h2><span class="material-icons">lock</span> Вход в систему</h2>
+            <p class="auth-subtitle">Пожалуйста, войдите в вашу учетную запись</p>
+        </header>
+
         <form id="auth-login-form" class="form">
             <div class="input-group">
-                <input type="email" id="auth-login-email" placeholder="Email" required>
+                <input type="email" id="auth-login-email" placeholder="Ваш email" required>
                 <span class="material-icons">email</span>
+                <span class="tooltip">Введите ваш email</span>
             </div>
             <div class="input-group">
                 <input type="password" id="auth-login-password" placeholder="Пароль" required>
                 <span class="material-icons">vpn_key</span>
+                <span class="tooltip">Введите ваш пароль</span>
             </div>
-            <button type="submit" class="btn btn-primary">Войти</button>
-            <button type="button" id="auth-forgot-password-btn" class="btn btn-secondary">Забыл пароль</button>
+            <div class="auth-actions">
+                <button type="submit" class="btn btn-primary">
+                    <span class="material-icons">login</span> Войти
+                </button>
+                <button type="button" id="auth-forgot-password-btn" class="btn btn-secondary">
+                    <span class="material-icons">help_outline</span> Забыл пароль
+                </button>
+            </div>
         </form>
-        <p id="auth-message" class="message"></p>
+
+        <div id="auth-message" class="message"></div>
     </div>
-</section>
+</div>

@@ -1,4 +1,3 @@
-from fastapi import FastAPI, Depends, HTTPException, status
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
 from typing import List, Optional
@@ -56,6 +55,11 @@ async def get_current_user(
     if user is None or not user.is_active:
         raise credentials_exception
     return user
+
+
+@app.get("/config")
+async def get_config():
+    return {"api_url": settings.API_URL}
 
 
 @app.get("/")

@@ -17,8 +17,15 @@ function initializeAuthListeners() {
             document.getElementById('auth-message').textContent = 'Успешный вход!';
             document.getElementById('auth-message').classList.remove('error');
             document.getElementById('auth-message').classList.add('success');
+            showToast('Добро пожаловать!', 'success');
             showManagementSection();
-            showSection('clients-section');
+
+            setTimeout(() => {
+                showSection('clients-section');
+                if (typeof loadClients === 'function') {
+                    loadClients();
+                }
+            }, 100);
         } catch (error) {
             document.getElementById('auth-message').textContent = error.response?.data?.detail || 'Ошибка входа';
             document.getElementById('auth-message').classList.add('error');
@@ -36,7 +43,8 @@ function initializeAuthListeners() {
                 section.style.display = 'none';
             }
         });
-        document.getElementById('auth-section').style.display = 'block';
+        document.getElementById('auth-section').style.display = 'flex';
+        setTimeout(() => document.getElementById('auth-section').classList.add('active'), 10);
         document.getElementById('sidebar-nav').style.display = 'none';
         document.getElementById('auth-message').textContent = '';
         document.getElementById('auth-message').classList.remove('error', 'success');
@@ -87,8 +95,10 @@ function initializeAuthListeners() {
                             <input type="password" id="auth-login-password" placeholder="Пароль" required>
                             <span class="material-icons">vpn_key</span>
                         </div>
-                        <button type="submit" class="btn btn-primary">Войти</button>
-                        <button type="button" id="auth-forgot-password-btn" class="btn btn-secondary">Забыл пароль</button>
+                        <div class="auth-actions">
+                            <button type="submit" class="btn btn-primary">Войти</button>
+                            <button type="button" id="auth-forgot-password-btn" class="btn btn-secondary">Забыл пароль</button>
+                        </div>
                     `;
                     initializeAuthListeners();
                 } catch (error) {
@@ -100,23 +110,5 @@ function initializeAuthListeners() {
             document.getElementById('auth-message').textContent = error.response?.data?.detail || 'Ошибка отправки кода';
             document.getElementById('auth-message').classList.add('error');
         }
-    });
-}
-
-function updateSidebarMenu() {
-    fetch(`${API_URL}/users/me`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-    })
-    .then(response => response.json())
-    .then(user => {
-        const isAdmin = user.is_admin;
-        document.getElementById('create-user-btn').style.display = isAdmin ? 'flex' : 'none';
-        document.getElementById('create-client-btn').style.display = isAdmin ? 'flex' : 'none';
-        document.getElementById('clients-btn').style.display = 'flex'; // Всегда видно
-        document.getElementById('profile-btn').style.display = 'flex'; // Всегда видно
-        document.getElementById('logout-btn').style.display = 'flex';  // Всегда видно
-    })
-    .catch(error => {
-        console.error('Ошибка получения данных пользователя:', error);
     });
 }
