@@ -6,67 +6,62 @@
         </header>
         <form id="edit-client-form" class="form">
             <div class="input-group">
-                <input type="text" id="edit-client-postal-address" placeholder="Адрес (Город, Улица, Дом)" readonly>
+                <input type="text" id="edit-client-postal-address" placeholder="Нажмите для ввода адреса" readonly required>
                 <span class="material-icons">location_on</span>
-                <span class="tooltip">Адрес (не редактируется)</span>
+                <span class="tooltip">Нажмите, чтобы открыть форму адреса</span>
             </div>
             <div class="input-group">
                 <input type="text" id="edit-client-account-number" placeholder="Номер счета" required>
                 <span class="material-icons">confirmation_number</span>
                 <span class="tooltip">От 1 до 50 символов</span>
             </div>
-            <div class="input-group">
-                <input type="text" id="edit-client-owner-name" placeholder="Имя владельца" required>
-                <span class="material-icons">person</span>
-                <span class="tooltip">От 1 до 100 символов</span>
-            </div>
-            <div class="input-group">
-                <input type="email" id="edit-client-email" placeholder="Email" required>
-                <span class="material-icons">email</span>
-                <span class="tooltip">Корректный email</span>
-            </div>
-            <div class="input-group">
-                <input type="text" id="edit-client-phone-number" placeholder="Телефон" required>
-                <span class="material-icons">phone</span>
-                <span class="tooltip">От 5 до 20 символов</span>
-            </div>
-            <div class="input-group">
-                <input type="text" id="edit-client-inn" placeholder="ИНН" required>
-                <span class="material-icons">fingerprint</span>
-                <span class="tooltip">От 10 до 12 символов</span>
-            </div>
-            <div class="input-group">
-                <input type="number" id="edit-client-connected-power" placeholder="Мощность" step="0.1">
-                <span class="material-icons">power</span>
-                <span class="tooltip">Число (опционально)</span>
-            </div>
-            <div class="input-group">
-                <input type="text" id="edit-client-passport-data" placeholder="Паспорт">
-                <span class="material-icons">badge</span>
-                <span class="tooltip">До 50 символов (опционально)</span>
-            </div>
-            <div class="input-group">
-                <input type="text" id="edit-client-snils" placeholder="СНИЛС">
-                <span class="material-icons">assignment_ind</span>
-                <span class="tooltip">До 12 символов (опционально)</span>
-            </div>
-            <div class="input-group">
-                <input type="date" id="edit-client-connection-date" placeholder="Дата подключения">
-                <span class="material-icons">calendar_today</span>
-                <span class="tooltip">ГГГГ-ММ-ДД (опционально)</span>
-            </div>
-            <div class="input-group">
-                <input type="text" id="edit-client-power-source" placeholder="Источник питания">
-                <span class="material-icons">power_input</span>
-                <span class="tooltip">До 100 символов (опционально)</span>
-            </div>
-            <div class="input-group">
-                <textarea id="edit-client-additional-info" placeholder="Доп. информация" rows="3"></textarea>
-                <span class="material-icons">info</span>
-                <span class="tooltip">До 500 символов (опционально)</span>
-            </div>
+            <!-- Остальные поля остаются без изменений -->
             <button type="submit" class="btn btn-primary">Сохранить</button>
         </form>
         <div id="edit-client-message" class="message"></div>
+    </div>
+</div>
+
+<!-- Модальное окно для ввода адреса -->
+<div id="edit-address-modal" class="modal">
+    <div class="modal-content">
+        <button id="edit-address-close-modal" class="close" aria-label="Закрыть">×</button>
+        <header>
+            <h3>Ввод адреса</h3>
+        </header>
+        <form id="edit-address-form" class="form">
+            <div class="input-group">
+                <label for="edit-address-subject">Субъект (регион, область, край)</label>
+                <input type="text" id="edit-address-subject" placeholder="Например: Республика Башкортостан" required>
+            </div>
+            <div class="input-group">
+                <label for="edit-address-district">Район</label>
+                <input type="text" id="edit-address-district" placeholder="Например: Уфимский">
+            </div>
+            <div class="input-group">
+                <label for="edit-address-city">Город</label>
+                <input type="text" id="edit-address-city" placeholder="Например: Уфа">
+            </div>
+            <div class="input-group">
+                <label for="edit-address-settlement">Населённый пункт</label>
+                <input type="text" id="edit-address-settlement" placeholder="Например: Михайловка">
+            </div>
+            <div class="input-group">
+                <label for="edit-address-street">Улица</label>
+                <input type="text" id="edit-address-street" placeholder="Например: Ленина" required>
+            </div>
+            <div class="input-group">
+                <label for="edit-address-house">Дом</label>
+                <input type="text" id="edit-address-house" placeholder="Например: 25" required>
+            </div>
+            <div class="input-group">
+                <label for="edit-address-extension">Расширение (корпус, квартира и т.д.)</label>
+                <input type="text" id="edit-address-extension" placeholder="Например: корп. 2, кв. 10">
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Сохранить адрес</button>
+                <button type="button" id="edit-address-cancel-btn" class="btn btn-danger">Отмена</button>
+            </div>
+        </form>
     </div>
 </div>

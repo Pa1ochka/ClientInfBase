@@ -6,12 +6,13 @@
 
     <form id="create-client-form" class="form">
         <div class="form-grid">
+            <!-- Основная информация -->
             <fieldset class="form-section">
                 <legend class="form-section-title">Основная информация</legend>
                 <div class="input-group">
-                    <input type="text" id="create-client-postal-address" placeholder="Адрес (Город, Улица, Дом)" required>
+                    <input type="text" id="create-client-postal-address" placeholder="Нажмите для ввода адреса" readonly required>
                     <span class="material-icons">location_on</span>
-                    <span class="tooltip">Уникальный адрес, 5-200 символов</span>
+                    <span class="tooltip">Нажмите, чтобы открыть форму адреса</span>
                 </div>
                 <div class="input-group">
                     <input type="text" id="create-client-account-number" placeholder="Номер счета" required>
@@ -25,6 +26,7 @@
                 </div>
             </fieldset>
 
+            <!-- Контактная информация -->
             <fieldset class="form-section">
                 <legend class="form-section-title">Контактная информация</legend>
                 <div class="input-group">
@@ -39,6 +41,7 @@
                 </div>
             </fieldset>
 
+            <!-- Документы -->
             <fieldset class="form-section">
                 <legend class="form-section-title">Документы</legend>
                 <div class="input-group">
@@ -58,6 +61,7 @@
                 </div>
             </fieldset>
 
+            <!-- Техническая информация -->
             <fieldset class="form-section">
                 <legend class="form-section-title">Техническая информация</legend>
                 <div class="input-group">
@@ -77,6 +81,7 @@
                 </div>
             </fieldset>
 
+            <!-- Дополнительная информация -->
             <fieldset class="form-section full-width">
                 <legend class="form-section-title">Дополнительная информация</legend>
                 <div class="input-group">
@@ -99,3 +104,47 @@
 
     <div id="create-client-message" class="message"></div>
 </section>
+
+<!-- Модальное окно для ввода адреса -->
+<div id="address-modal" class="modal">
+    <div class="modal-content">
+        <button id="address-close-modal" class="close" aria-label="Закрыть">×</button>
+        <header>
+            <h3>Ввод адреса</h3>
+        </header>
+        <form id="address-form" class="form">
+            <div class="input-group">
+                <label for="address-subject">Субъект (регион, область, край)</label>
+                <input type="text" id="address-subject" placeholder="Например: Республика Башкортостан" required>
+            </div>
+            <div class="input-group">
+                <label for="address-district">Район</label>
+                <input type="text" id="address-district" placeholder="Например: Уфимский">
+            </div>
+            <div class="input-group">
+                <label for="address-city">Город</label>
+                <input type="text" id="address-city" placeholder="Например: Уфа">
+            </div>
+            <div class="input-group">
+                <label for="address-settlement">Населённый пункт</label>
+                <input type="text" id="address-settlement" placeholder="Например: Михайловка">
+            </div>
+            <div class="input-group">
+                <label for="address-street">Улица</label>
+                <input type="text" id="address-street" placeholder="Например: Ленина" required>
+            </div>
+            <div class="input-group">
+                <label for="address-house">Дом</label>
+                <input type="text" id="address-house" placeholder="Например: 25" required>
+            </div>
+            <div class="input-group">
+                <label for="address-extension">Расширение (корпус, квартира и т.д.)</label>
+                <input type="text" id="address-extension" placeholder="Например: корп. 2, кв. 10">
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Сохранить адрес</button>
+                <button type="button" id="address-cancel-btn" class="btn btn-danger">Отмена</button>
+            </div>
+        </form>
+    </div>
+</div>

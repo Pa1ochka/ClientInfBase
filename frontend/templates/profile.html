@@ -1,91 +1,82 @@
 <div id="profile-modal" class="modal">
     <div class="modal-content">
         <button id="profile-close-modal" class="close" aria-label="Закрыть">×</button>
-        <header class="profile-header">
-            <h2><span class="material-icons">account_circle</span> Мой профиль</h2>
-        </header>
-
-        <section id="profile-view" class="profile-section">
-            <div class="profile-avatar">
-                <img id="profile-avatar-img" src="/static/img/default-avatar.png" alt="Аватар" class="profile-avatar-img">
-                <button id="profile-avatar-edit" class="btn btn-secondary avatar-edit-btn">
-                    <span class="material-icons">edit</span>
-                </button>
+        <section id="profile-card" class="profile-card"> <!-- Добавлен id -->
+            <div class="profile-header">
+                <div class="avatar-container">
+                    <img id="profile-avatar-img" src="/static/img/default-avatar.png" alt="Аватар" class="avatar">
+                    <div class="avatar-actions">
+                        <button id="profile-avatar-edit" class="avatar-btn edit" title="Изменить аватар">
+                            <span class="material-icons">edit</span>
+                        </button>
+                        <button id="profile-avatar-delete" class="avatar-btn delete" title="Удалить аватар">
+                            <span class="material-icons">delete</span>
+                        </button>
+                    </div>
+                </div>
+                <h2 id="profile-view-username" class="profile-name"></h2>
+                <p class="profile-role" id="profile-view-role"></p>
             </div>
-            <div class="profile-info">
-                <h3 id="profile-view-username"></h3>
-                <p><strong>Email:</strong> <span id="profile-view-email"></span></p>
-                <p><strong>Статус:</strong> <span id="profile-view-role"></span></p>
-                <p><strong>Дата регистрации:</strong> <span id="profile-view-created"></span></p>
+            <div class="profile-details">
+                <div class="detail-item">
+                    <span class="material-icons">email</span>
+                    <span id="profile-view-email"></span>
+                </div>
+                <div class="detail-item">
+                    <span class="material-icons">event</span>
+                    <span id="profile-view-created"></span>
+                </div>
             </div>
             <div class="profile-actions">
-                <button id="profile-edit-btn" class="btn btn-primary">
-                    <span class="material-icons">edit</span> Редактировать
-                </button>
-                <button id="profile-password-btn" class="btn btn-secondary">
-                    <span class="material-icons">lock</span> Сменить пароль
-                </button>
+                <button id="profile-edit-btn" class="btn btn-primary">Редактировать профиль</button>
+                <button id="profile-password-btn" class="btn btn-secondary">Сменить пароль</button>
             </div>
         </section>
 
-        <form id="profile-edit-form" class="form profile-section" style="display: none;" enctype="multipart/form-data">
+        <form id="profile-edit-form" class="form edit-form" style="display: none;">
             <h3>Редактирование профиля</h3>
             <div class="input-group">
-                <input type="email" id="profile-email" placeholder="Email" required>
-                <span class="material-icons">email</span>
-                <span class="tooltip">Корректный email</span>
+                <label for="profile-email">Email</label>
+                <input type="email" id="profile-email" required>
             </div>
             <div class="input-group">
-                <input type="text" id="profile-username" placeholder="Имя пользователя" required>
-                <span class="material-icons">person</span>
-                <span class="tooltip">От 3 до 50 символов</span>
+                <label for="profile-username">Имя пользователя</label>
+                <input type="text" id="profile-username" required>
             </div>
             <div class="input-group">
-                <input type="password" id="profile-current-password" placeholder="Текущий пароль" required>
-                <span class="material-icons">lock</span>
-                <span class="tooltip">Введите текущий пароль для подтверждения</span>
+                <label for="profile-current-password">Текущий пароль</label>
+                <input type="password" id="profile-current-password" required>
             </div>
             <div class="input-group avatar-upload-group">
                 <input type="file" id="profile-avatar-upload" accept="image/*" style="display: none;">
-                <label for="profile-avatar-upload" class="btn btn-secondary">
+                <button type="button" id="upload-avatar-btn" class="btn btn-secondary">
                     <span class="material-icons">upload</span> Загрузить аватар
-                </label>
+                </button>
                 <span id="avatar-upload-status" class="avatar-status"></span>
             </div>
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary">
-                    <span class="material-icons">save</span> Сохранить
-                </button>
-                <button type="button" id="profile-cancel-btn" class="btn btn-danger">
-                    <span class="material-icons">close</span> Отмена
-                </button>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+                <button type="button" id="profile-cancel-btn" class="btn btn-danger">Отмена</button>
             </div>
         </form>
 
-        <form id="profile-password-form" class="form profile-section" style="display: none;">
+        <form id="profile-password-form" class="form password-form" style="display: none;">
             <h3>Смена пароля</h3>
             <div class="input-group">
-                <input type="password" id="profile-old-password" placeholder="Старый пароль" required>
-                <span class="material-icons">lock</span>
-                <span class="tooltip">Введите текущий пароль</span>
+                <label for="profile-old-password">Старый пароль</label>
+                <input type="password" id="profile-old-password" required>
             </div>
             <div class="input-group">
-                <input type="password" id="profile-new-password" placeholder="Новый пароль" required>
-                <span class="material-icons">lock_open</span>
-                <span class="tooltip">Минимум 8 символов</span>
+                <label for="profile-new-password">Новый пароль</label>
+                <input type="password" id="profile-new-password" required>
             </div>
             <div class="input-group">
-                <input type="password" id="profile-confirm-password" placeholder="Подтвердите пароль" required>
-                <span class="material-icons">check_circle</span>
-                <span class="tooltip">Повторите новый пароль</span>
+                <label for="profile-confirm-password">Подтвердите пароль</label>
+                <input type="password" id="profile-confirm-password" required>
             </div>
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary">
-                    <span class="material-icons">save</span> Обновить пароль
-                </button>
-                <button type="button" id="profile-password-cancel-btn" class="btn btn-danger">
-                    <span class="material-icons">close</span> Отмена
-                </button>
+                <button type="submit" class="btn btn-primary">Обновить пароль</button>
+                <button type="button" id="profile-password-cancel-btn" class="btn btn-danger">Отмена</button>
             </div>
         </form>
 

@@ -22,7 +22,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         { fileName: 'create-client', container: '#main-content', sectionId: 'create-client-section' },
         { fileName: 'clients', container: '#main-content', sectionId: 'clients-section' },
         { fileName: 'edit-client', container: '#modal-container', sectionId: 'edit-modal' },
-        { fileName: 'profile', container: '#modal-container', sectionId: 'profile-modal' }
+        { fileName: 'profile', container: '#modal-container', sectionId: 'profile-modal' },
+        { fileName: 'create-client', container: '#modal-container', sectionId: 'address-modal' },
+        { fileName: 'edit-client', container: '#modal-container', sectionId: 'edit-address-modal' }
     ];
 
     Promise.all(sectionsToLoad.map(section =>

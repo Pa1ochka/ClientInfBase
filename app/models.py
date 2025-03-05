@@ -1,10 +1,8 @@
-# 4. models.py
 from sqlalchemy import Column, Integer, String, Date, Float, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
-
 
 class User(Base):
     __tablename__ = "users"
@@ -13,15 +11,16 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     username = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
-    is_admin = Column(Boolean, default=False)  # Заменяем role на is_admin как в вашем коде
+    is_admin = Column(Boolean, default=False)
     is_active = Column(Boolean, default=True)
     reset_code = Column(String, nullable=True)
+    avatar_url = Column(String, nullable=True)
+    created_at = Column(Date, nullable=True, default=None)  # Добавлено для даты регистрации
 
     clients = relationship("Client", back_populates="creator")
 
     def __repr__(self):
         return f"<User(email='{self.email}', username='{self.username}', is_admin={self.is_admin})>"
-
 
 class Client(Base):
     __tablename__ = "clients"

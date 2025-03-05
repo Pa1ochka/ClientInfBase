@@ -208,6 +208,123 @@
     display: block;
 }
 
+/* Модальное окно адреса */
+#address-modal .modal-content,
+#edit-address-modal .modal-content {
+    max-width: 600px;
+    padding: 25px;
+    border-radius: 12px;
+    background: var(--light);
+    box-shadow: 0 8px 25px rgba(31, 42, 68, 0.15);
+}
+
+#address-modal header,
+#edit-address-modal header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#address-modal h3,
+#edit-address-modal h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin: 0;
+}
+
+#address-modal .form,
+#edit-address-modal .form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#address-modal .input-group,
+#edit-address-modal .input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+#address-modal .input-group label,
+#edit-address-modal .input-group label {
+    font-size: 0.9rem;
+    color: var(--gray);
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+#address-modal .input-group input,
+#edit-address-modal .input-group input {
+    padding: 10px 12px;
+    font-size: 1rem;
+    border: 1px solid var(--gray-light);
+    border-radius: 6px;
+    background: #fff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#address-modal .input-group input:focus,
+#edit-address-modal .input-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 108, 255, 0.15);
+}
+
+#address-modal .form-actions,
+#edit-address-modal .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+#address-modal .btn,
+#edit-address-modal .btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 6px;
+    transition: var(--transition);
+}
+
+#address-modal .btn-primary,
+#edit-address-modal .btn-primary {
+    background: var(--primary);
+    color: #fff;
+}
+
+#address-modal .btn-primary:hover,
+#edit-address-modal .btn-primary:hover {
+    background: var(--primary-dark);
+}
+
+#address-modal .btn-danger,
+#edit-address-modal .btn-danger {
+    background: var(--danger);
+    color: #fff;
+}
+
+#address-modal .btn-danger:hover,
+#edit-address-modal .btn-danger:hover {
+    background: #d62b38;
+}
+
+#address-modal .close,
+#edit-address-modal .close {
+    top: 15px;
+    right: 15px;
+    font-size: 28px;
+    width: 40px;
+    height: 40px;
+    background: var(--gray-light);
+    color: var(--gray);
+}
+
+#address-modal .close:hover,
+#edit-address-modal .close:hover {
+    background: var(--gray);
+    color: var(--dark);
+}
+
 @media (max-width: 768px) {
     .form-grid {
         grid-template-columns: 1fr;

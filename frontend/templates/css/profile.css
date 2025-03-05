@@ -3,8 +3,8 @@
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
+    width: 100%;
+    height: 100%;
     background: rgba(31, 42, 68, 0.6);
     backdrop-filter: blur(4px);
     z-index: 1000;
@@ -20,88 +20,159 @@
 
 .modal-content {
     background: var(--light);
-    border-radius: 20px;
+    border-radius: 16px;
     width: 100%;
-    max-width: 600px;
+    max-width: 500px;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(31, 42, 68, 0.25);
-    transform: translateY(20px);
-    transition: var(--transition);
-    animation: slideInUp 0.4s ease-out;
+    box-shadow: 0 10px 30px rgba(31, 42, 68, 0.2);
+    padding: 0;
     margin: 20px;
-    padding: 40px;
+    animation: slideInUp 0.4s ease-out;
 }
 
-.modal.active .modal-content {
-    transform: translateY(0);
+.profile-card {
+    padding: 30px;
+    text-align: center;
 }
 
-.profile-header h2 {
-    margin: 0 0 20px;
-    display: flex;
-    align-items: center;
-    color: var(--dark);
-    font-size: 1.875rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-}
-
-.profile-header .material-icons {
-    margin-right: 10px;
-    color: var(--primary);
-}
-
-.profile-section {
-    margin-bottom: 20px;
-}
-
-.profile-avatar {
+.profile-header {
     position: relative;
-    display: flex;
-    justify-content: center;
     margin-bottom: 20px;
 }
 
-.profile-avatar-img {
+.avatar-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 15px;
+}
+
+.avatar {
     width: 120px;
     height: 120px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid var(--primary);
+    border: 4px solid var(--primary);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
 }
 
-.avatar-edit-btn {
+.avatar:hover {
+    transform: scale(1.05);
+}
+
+.avatar-actions {
     position: absolute;
     bottom: 0;
-    right: 40%;
-    padding: 8px;
-    min-width: 0;
+    right: 0;
+    display: flex;
+    gap: 8px;
+}
+
+.avatar-btn {
+    background: var(--primary);
+    color: #fff;
+    border: none;
     border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.profile-info {
-    text-align: center;
+.avatar-btn:hover {
+    background: var(--primary-dark);
+    transform: scale(1.1);
 }
 
-.profile-info h3 {
-    margin: 0 0 10px;
+.avatar-btn.delete {
+    background: var(--danger);
+}
+
+.avatar-btn.delete:hover {
+    background: #d62b38;
+}
+
+.profile-name {
+    font-size: 1.75rem;
+    font-weight: 700;
     color: var(--dark);
-    font-size: 1.5rem;
-    font-weight: 600;
+    margin: 0;
 }
 
-.profile-info p {
-    margin: 5px 0;
+.profile-role {
+    font-size: 1rem;
     color: var(--gray);
+    margin: 5px 0 0;
+}
+
+.profile-details {
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 1rem;
+    color: var(--gray);
+}
+
+.detail-item .material-icons {
+    color: var(--primary);
+    font-size: 1.2rem;
 }
 
 .profile-actions {
     display: flex;
     gap: 15px;
     justify-content: center;
-    margin-top: 20px;
+}
+
+.edit-form, .password-form {
+    padding: 30px;
+}
+
+.edit-form h3, .password-form h3 {
+    font-size: 1.5rem;
+    color: var(--dark);
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--gray);
+    margin-bottom: 5px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 1rem;
+    border: 1px solid var(--gray-light);
+    border-radius: 8px;
+    background: #fff;
+    transition: var(--transition);
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 108, 255, 0.15);
 }
 
 .avatar-upload-group {
@@ -110,12 +181,8 @@
     gap: 15px;
 }
 
-.avatar-upload-group label {
-    cursor: pointer;
-}
-
 .avatar-status {
-    font-size: 14px;
+    font-size: 0.9rem;
     color: var(--gray);
 }
 
@@ -127,8 +194,72 @@
     color: var(--danger);
 }
 
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 28px; /* Увеличен размер иконки */
+    color: var(--gray);
+    cursor: pointer;
+    background: var(--gray-light);
+    width: 40px; /* Увеличена ширина */
+    height: 40px; /* Увеличена высота */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    transition: var(--transition);
+    z-index: 10; /* Убедимся, что кнопка поверх других элементов */
+}
+
+.close:hover {
+    color: var(--dark);
+    background: var(--gray);
+    transform: rotate(90deg);
+}
+
+.message {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-top: 15px;
+    background: #fde8e8;
+    color: #ff4757;
+    border-left: 4px solid #ff4757;
+    display: none; /* Скрыт по умолчанию */
+}
+
+.message.success {
+    background: #dcfce7;
+    color: #34c759;
+    border-left: 4px solid #34c759;
+    display: block; /* Показываем при успехе */
+}
+
+.message.error {
+    background: #fde8e8;
+    color: #ff4757;
+    border-left: 4px solid #ff4757;
+    display: block; /* Показываем при ошибке */
+}
+
 @media (max-width: 768px) {
-    .profile-actions {
+    .modal-content {
+        max-width: 90%;
+    }
+    .profile-actions, .form-actions {
         flex-direction: column;
+    }
+    .avatar-btn {
+        width: 28px;
+        height: 28px;
     }
 }

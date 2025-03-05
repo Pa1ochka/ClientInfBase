@@ -1,12 +1,95 @@
 function initializeCreateClientListeners() {
     document.getElementById('create-client-btn').addEventListener('click', () => showSection('create-client-section'));
 
+    const addressInput = document.getElementById('create-client-postal-address');
+    if (addressInput) {
+        addressInput.addEventListener('click', () => {
+            const modal = document.getElementById('address-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('active'), 10);
+            }
+        });
+    }
+
+    const closeModalBtn = document.getElementById('address-close-modal');
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', () => {
+            const modal = document.getElementById('address-modal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.style.display = 'none', 300);
+            }
+        });
+    }
+
+    const cancelBtn = document.getElementById('address-cancel-btn');
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            const modal = document.getElementById('address-modal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.style.display = 'none', 300);
+            }
+        });
+    }
+
+    const addressForm = document.getElementById('address-form');
+    if (addressForm) {
+        addressForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const subject = document.getElementById('address-subject').value.trim();
+            const district = document.getElementById('address-district').value.trim();
+            const city = document.getElementById('address-city').value.trim();
+            const settlement = document.getElementById('address-settlement').value.trim();
+            const street = document.getElementById('address-street').value.trim();
+            const house = document.getElementById('address-house').value.trim();
+            const extension = document.getElementById('address-extension').value.trim();
+
+            const regionTypes = {
+                'республика': 'Респ.',
+                'область': 'обл.',
+                'край': 'кр.',
+                'автономный округ': 'АО'
+            };
+            let formattedSubject = subject;
+            for (const [type, abbr] of Object.entries(regionTypes)) {
+                if (subject.toLowerCase().includes(type)) {
+                    formattedSubject = `${subject.replace(new RegExp(type, 'i'), '').trim()} ${abbr}`;
+                    break;
+                }
+            }
+
+            const formattedAddress = [
+                formattedSubject ? formattedSubject : '',
+                district ? `${district} р-н` : '',
+                city ? `г. ${city}` : '',
+                settlement ? `с. ${settlement}` : '',
+                street ? `ул. ${street}` : '',
+                house ? `д. ${house}` : '',
+                extension ? extension : ''
+            ].filter(part => part).join(', ');
+
+            if (addressInput) {
+                addressInput.value = formattedAddress;
+            }
+
+            const modal = document.getElementById('address-modal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.style.display = 'none', 300);
+            }
+        });
+    }
+
     document.getElementById('create-client-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const connectionDate = document.getElementById('create-client-connection-date').value;
         const postalAddress = document.getElementById('create-client-postal-address').value;
-        if (!postalAddress.match(/^[А-Яа-яA-Za-z\s]+,\s+[А-Яа-яA-Za-z\s]+,\s+\d+$/)) {
-            document.getElementById('create-client-message').textContent = 'postal_address: Неверный формат адреса (Требование: Город, Улица, Дом)';
+
+        if (!postalAddress) {
+            document.getElementById('create-client-message').textContent = 'postal_address: Адрес обязателен';
             document.getElementById('create-client-message').classList.add('error');
             return;
         }
@@ -43,7 +126,7 @@ function initializeCreateClientListeners() {
                     const field = err.loc[err.loc.length - 1];
                     const msg = err.msg;
                     const requirements = {
-                        postal_address: 'Уникальный адрес, 5-200 символов (Город, Улица, Дом)',
+                        postal_address: 'Уникальный адрес, 5-200 символов',
                         account_number: 'От 1 до 50 символов',
                         owner_name: 'От 1 до 100 символов',
                         email: 'Корректный email (должен содержать @)',

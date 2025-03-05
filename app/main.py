@@ -1,35 +1,37 @@
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
 from typing import List, Optional
+from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+import secrets
+import smtplib
+from email.mime.text import MIMEText
+import shutil
+import os
+from datetime import timedelta
 from . import crud, models, schemas
 from .database import engine, get_db
 from .security import create_access_token, verify_password, get_password_hash
 from .config import settings
-from datetime import timedelta
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse
-import secrets
-import smtplib
-from email.mime.text import MIMEText
-from fastapi import FastAPI, Depends, HTTPException, status
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
 
 app = FastAPI(title="Система учета клиентов")
-
 
 # Настройка CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://clients.aores.ru"],  # Разрешённый источник
+    allow_origins=["https://clients.aores.ru"],
     allow_credentials=True,
-    allow_methods=["*"],  # Разрешить все методы (GET, POST и т.д.)
-    allow_headers=["*"],  # Разрешить все заголовки
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
+# Подключение статических файлов
 app.mount("/static", StaticFiles(directory="frontend/templates"), name="static")
 
+# Создание таблиц в базе данных
 models.Base.metadata.create_all(bind=engine)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -56,17 +58,13 @@ async def get_current_user(
         raise credentials_exception
     return user
 
-
 @app.get("/config")
 async def get_config():
     return {"api_url": settings.API_URL}
 
-
 @app.get("/")
 async def read_index():
     return FileResponse("frontend/templates/index.html")
-
-
 
 @app.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
@@ -96,12 +94,12 @@ async def forgot_password(request: dict, db: Session = Depends(get_db)):
 
     msg = MIMEText(f"Ваш код для сброса пароля: {reset_code}")
     msg['Subject'] = 'Сброс пароля'
-    msg['From'] = "your-email@gmail.com"
+    msg['From'] = "your-email@gmail.com"  # Замените на ваш email
     msg['To'] = email
 
     with smtplib.SMTP("smtp.gmail.com", 587) as server:
         server.starttls()
-        server.login("your-email@gmail.com", "your-app-password")
+        server.login("your-email@gmail.com", "your-app-password")  # Замените на ваш email и пароль приложения
         server.send_message(msg)
 
     return {"message": "Код отправлен на ваш email"}
@@ -133,6 +131,88 @@ def update_current_user(
     current_user: models.User = Depends(get_current_user)
 ):
     return crud.update_user(db, user, current_user)
+
+
+@app.post("/users/me/avatar", response_model=schemas.User)
+async def upload_avatar(
+        avatar: UploadFile = File(...),
+        db: Session = Depends(get_db),
+        current_user: models.User = Depends(get_current_user)
+):
+    print(f"Received file: {avatar.filename}, size: {avatar.size}, content_type: {avatar.content_type}")
+
+    # Проверка размера файла (макс. 20MB)
+    if avatar.size > 20 * 1024 * 1024:
+        print(f"File size {avatar.size} exceeds 20MB limit")
+        raise HTTPException(status_code=400, detail="File size exceeds 20MB")
+
+    # Проверка типа файла
+    allowed_types = ["image/jpeg", "image/png", "image/gif"]
+    if avatar.content_type not in allowed_types:
+        print(f"Invalid content type: {avatar.content_type}. Allowed: {allowed_types}")
+        raise HTTPException(status_code=400,
+                            detail=f"Only JPEG, PNG, or GIF files are allowed. Got: {avatar.content_type}")
+
+    # Путь для сохранения аватаров (исправлен на frontend/templates/img/avatars)
+    upload_dir = "frontend/templates/img/avatars"  # Изменено с static/img/avatars
+    os.makedirs(upload_dir, exist_ok=True)
+
+    # Генерируем уникальное имя файла
+    file_extension = avatar.filename.split('.')[-1]
+    file_name = f"{current_user.id}_{secrets.token_hex(8)}.{file_extension}"
+    file_path = os.path.join(upload_dir, file_name)
+
+    # Удаляем старый аватар, если он существует
+    if current_user.avatar_url and os.path.exists(f"frontend/templates{current_user.avatar_url}"):
+        os.remove(f"frontend/templates{current_user.avatar_url}")
+
+    # Сохраняем новый файл
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(avatar.file, buffer)
+
+    # Обновляем путь к аватару в базе данных
+    avatar_url = f"/static/img/avatars/{file_name}"  # Оставляем путь для фронтенда
+    current_user.avatar_url = avatar_url
+    db.commit()
+    db.refresh(current_user)
+
+    print(f"Avatar uploaded successfully: {avatar_url}")
+    return current_user
+
+
+@app.delete("/users/me/avatar", response_model=schemas.User)
+async def delete_avatar(
+        db: Session = Depends(get_db),
+        current_user: models.User = Depends(get_current_user)
+):
+    # Удаляем файл аватара, если он существует
+    if current_user.avatar_url and os.path.exists(f"frontend/templates{current_user.avatar_url}"):
+        os.remove(f"frontend/templates{current_user.avatar_url}")
+
+    # Сбрасываем avatar_url в базе данных
+    current_user.avatar_url = None
+    db.commit()
+    db.refresh(current_user)
+
+    print(f"Avatar deleted for user {current_user.username}")
+    return current_user
+
+@app.put("/users/me/password", response_model=schemas.User)
+def update_password(
+    password_data: dict,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    old_password = password_data.get("old_password")
+    new_password = password_data.get("new_password")
+
+    if not verify_password(old_password, current_user.hashed_password):
+        raise HTTPException(status_code=400, detail="Incorrect old password")
+
+    current_user.hashed_password = get_password_hash(new_password)
+    db.commit()
+    db.refresh(current_user)
+    return current_user
 
 @app.post("/users/", response_model=schemas.User)
 def create_user(
@@ -204,14 +284,8 @@ def search_clients(
     print(f"User {current_user.username} searched for: {search}")
     return crud.search_clients(db, search, skip, limit)
 
-
-# from .crud import get_password_hash
-# from .database import get_db
-# from . import models
-
 def create_first_admin():
     db = next(get_db())
-    # Проверяем, есть ли уже пользователи
     if not db.query(models.User).first():
         hashed_password = get_password_hash("armen000")
         admin = models.User(
@@ -224,8 +298,8 @@ def create_first_admin():
         db.add(admin)
         db.commit()
         db.refresh(admin)
-        print("Первый администратор создан: admin@example.com / adminpass123")
+        print("Первый администратор создан: ab@aores.ru / armen000")
     db.close()
 
-# Вызываем функцию при запуске
-#create_first_admin()
+# Вызов при запуске (раскомментируйте, если нужно)
+# create_first_admin()
