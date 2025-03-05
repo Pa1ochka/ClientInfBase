@@ -182,18 +182,14 @@ async def upload_avatar(
 
 @app.delete("/users/me/avatar", response_model=schemas.User)
 async def delete_avatar(
-        db: Session = Depends(get_db),
-        current_user: models.User = Depends(get_current_user)
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
 ):
-    # Удаляем файл аватара, если он существует
     if current_user.avatar_url and os.path.exists(f"frontend/templates{current_user.avatar_url}"):
         os.remove(f"frontend/templates{current_user.avatar_url}")
-
-    # Сбрасываем avatar_url в базе данных
     current_user.avatar_url = None
     db.commit()
     db.refresh(current_user)
-
     print(f"Avatar deleted for user {current_user.username}")
     return current_user
 
@@ -337,15 +333,17 @@ def read_user(
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
+
 @app.put("/users/{user_id}", response_model=schemas.User)
 def update_user(
-    user_id: int,
-    user: schemas.UserUpdate,
-    db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user)
+        user_id: int,
+        user: schemas.UserUpdate,
+        db: Session = Depends(get_db),
+        current_user: models.User = Depends(get_current_user)
 ):
     if not current_user.is_admin:
         raise HTTPException(status_code=403, detail="Только администраторы могут редактировать пользователей")
+
     db_user = db.query(models.User).filter(models.User.id == user_id).first()
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -353,9 +351,23 @@ def update_user(
     if not verify_password(user.current_password, current_user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect current password")
 
+    # Проверка прав на изменение статуса администратора
+    if 'is_admin' in user.dict(exclude_unset=True):
+        if db_user.is_admin and db_user.created_by_admin != current_user.id:
+            raise HTTPException(
+                status_code=403,
+                detail="Вы не можете изменить статус администратора, которого не назначали"
+            )
+        if user.is_admin and not db_user.is_admin:
+            db_user.created_by_admin = current_user.id  # Устанавливаем создателя при назначении админа
+        elif not user.is_admin and db_user.is_admin and db_user.created_by_admin == current_user.id:
+            db_user.created_by_admin = None  # Убираем создателя при снятии прав
+
+    # Обновление остальных данных
     if db_user.email != user.email and crud.get_user_by_email(db, user.email):
         raise HTTPException(status_code=400, detail="Email already registered")
-    if db_user.username != user.username and db.query(models.User).filter(models.User.username == user.username).first():
+    if db_user.username != user.username and db.query(models.User).filter(
+            models.User.username == user.username).first():
         raise HTTPException(status_code=400, detail="Username already taken")
 
     db_user.email = user.email

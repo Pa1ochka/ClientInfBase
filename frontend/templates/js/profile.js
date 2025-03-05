@@ -99,21 +99,21 @@ function initializeProfileListeners() {
         }
     });
 
-    const avatarDelete = document.getElementById('profile-avatar-delete');
-    if (avatarDelete) avatarDelete.addEventListener('click', async () => {
-        if (confirm('Вы уверены, что хотите удалить аватар?')) {
-            try {
-                const response = await axios.delete(`${API_URL}/users/me/avatar`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                document.getElementById('profile-avatar-img').src = '/static/img/default-avatar.png';
-                showToast('Аватар удалён', 'success');
-            } catch (error) {
-                showError('profile-message', error);
-                showToast('Ошибка удаления аватара', 'error');
-            }
+    const avatarDelete = document.getElementById('profile-avatar-delete').addEventListener('click', async () => {
+    if (confirm('Вы уверены, что хотите удалить аватар?')) {
+        try {
+            const response = await axios.delete(`${API_URL}/users/me/avatar`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            document.getElementById('profile-avatar-img').src = '/static/img/default-avatar.png';
+            document.getElementById('sidebar-avatar').src = '/static/img/default-avatar.png'; // Обновляем аватар в боковом меню
+            showToast('Аватар удалён', 'success');
+        } catch (error) {
+            showError('profile-message', error);
+            showToast('Ошибка удаления аватара', 'error');
         }
-    });
+    }
+});
 
     const editForm = document.getElementById('profile-edit-form');
     if (editForm) editForm.addEventListener('submit', async (e) => {

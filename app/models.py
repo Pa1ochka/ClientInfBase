@@ -16,9 +16,11 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     reset_code = Column(String, nullable=True)
     avatar_url = Column(String, nullable=True)
-    created_at = Column(DateTime, server_default=func.now(), nullable=False)  # Изменено на nullable=False
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+    created_by_admin = Column(Integer, ForeignKey("users.id"), nullable=True)  # Кто назначил администратором
 
     clients = relationship("Client", back_populates="creator")
+    creator = relationship("User", remote_side=[id])  # Связь с создателем
 
     def __repr__(self):
         return f"<User(email='{self.email}', username='{self.username}', is_admin={self.is_admin})>"

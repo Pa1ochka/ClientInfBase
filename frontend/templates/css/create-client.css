@@ -217,3 +217,74 @@
         max-width: 100%;
     }
 }
+
+#address-modal .modal-content,
+#edit-address-modal .modal-content {
+    max-width: 700px;
+    padding: 25px;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 8px 25px rgba(31, 42, 68, 0.15);
+    width: 90%;
+    height: auto; /* Убираем фиксированную высоту */
+    overflow-y: visible; /* Убираем скроллбар */
+}
+
+#address-modal .form,
+#edit-address-modal .form {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Две колонки */
+    gap: 15px;
+    padding: 10px 0;
+}
+
+#address-modal .input-group,
+#edit-address-modal .input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+#address-modal .input-group input,
+#edit-address-modal .input-group input {
+    padding: 10px 12px;
+    font-size: 1rem;
+    border: 1px solid #eef2f7;
+    border-radius: 6px;
+    background: #fff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#address-modal .form-actions,
+#edit-address-modal .form-actions {
+    grid-column: span 2;
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+#address-modal .close,
+#edit-address-modal .close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 28px;
+    color: #7b8794;
+    cursor: pointer;
+    background: #eef2f7;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+#address-modal .close:hover,
+#edit-address-modal .close:hover {
+    color: #2c3e50;
+    background: #bdc3c7;
+    transform: rotate(90deg);
+}

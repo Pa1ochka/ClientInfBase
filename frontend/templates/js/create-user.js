@@ -82,7 +82,7 @@ async function editUser(userId) {
 
         const modal = document.getElementById('edit-user-modal');
         if (!modal) {
-            console.error('Edit user modal not found. Check if it is loaded in DOM.');
+            console.error('Edit user modal not found');
             showToast('Ошибка: модальное окно редактирования не найдено', 'error');
             return;
         }
@@ -94,13 +94,7 @@ async function editUser(userId) {
         const currentPasswordInput = document.getElementById('edit-user-current-password');
 
         if (!emailInput || !usernameInput || !passwordInput || !isAdminCheckbox || !currentPasswordInput) {
-            console.error('One or more edit user form elements not found:', {
-                emailInput: !!emailInput,
-                usernameInput: !!usernameInput,
-                passwordInput: !!passwordInput,
-                isAdminCheckbox: !!isAdminCheckbox,
-                currentPasswordInput: !!currentPasswordInput
-            });
+            console.error('One or more edit user form elements not found');
             showToast('Ошибка: элементы формы редактирования пользователя не найдены', 'error');
             return;
         }
@@ -109,6 +103,17 @@ async function editUser(userId) {
         usernameInput.value = user.username;
         isAdminCheckbox.checked = user.is_admin;
         passwordInput.value = '';
+
+        // Проверяем, может ли текущий пользователь менять статус
+        const currentUserResponse = await axios.get(`${API_URL}/users/me`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const currentUser = currentUserResponse.data;
+        if (!currentUser.is_admin || (user.is_admin && user.created_by_admin !== currentUser.id)) {
+            isAdminCheckbox.disabled = true; // Отключаем чекбокс, если нет прав
+        } else {
+            isAdminCheckbox.disabled = false;
+        }
 
         modal.style.display = 'flex';
         setTimeout(() => modal.classList.add('active'), 10);

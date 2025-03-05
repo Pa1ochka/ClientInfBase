@@ -1,18 +1,40 @@
 function initializeCreateClientListeners() {
     document.getElementById('create-client-btn').addEventListener('click', () => showSection('create-client-section'));
 
-    // Форматирование адреса при вводе
-    const addressInput = document.getElementById('create-client-postal-address');
-    addressInput.addEventListener('input', (e) => {
-        let value = e.target.value.trim();
-        // Разделяем введённый адрес на части (город, улица, дом)
-        const parts = value.split(/[\s,]+/).filter(part => part);
-        if (parts.length >= 3) {
-            // Форматируем: Город, Улица, Дом
-            value = `${parts[0]}, ${parts[1]}, ${parts[2]}`;
-            e.target.value = value;
+const addressInput = document.getElementById('create-client-postal-address');
+if (addressInput) {
+    addressInput.addEventListener('click', () => {
+        const modal = document.getElementById('address-modal');
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('active'), 10);
+
+        const addressForm = document.getElementById('address-form');
+        if (addressForm) {
+            addressForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                // ... (форматирование адреса остается без изменений)
+                modal.classList.remove('active');
+                setTimeout(() => modal.style.display = 'none', 300);
+            }, { once: true }); // Слушатель одноразовый
+        }
+
+        const closeBtn = document.getElementById('address-close-modal');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                modal.classList.remove('active');
+                setTimeout(() => modal.style.display = 'none', 300);
+            }, { once: true }); // Слушатель одноразовый
+        }
+
+        const cancelBtn = document.getElementById('address-cancel-btn');
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => {
+                modal.classList.remove('active');
+                setTimeout(() => modal.style.display = 'none', 300);
+            }, { once: true });
         }
     });
+}
 
 document.getElementById('create-client-form').addEventListener('submit', async (e) => {
     e.preventDefault();

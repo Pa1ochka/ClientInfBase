@@ -90,6 +90,17 @@ function checkAuthStatus() {
     }
 }
 
+function initializeClientsListeners() {
+    const clientsBtn = document.getElementById('clients-btn');
+    if (clientsBtn) {
+        clientsBtn.addEventListener('click', () => {
+            showSection('clients-section');
+            loadClients(); // Автоматическая загрузка списка клиентов
+        });
+    }
+    // ... (остальной код остается без изменений)
+}
+
 function showManagementSection() {
     document.getElementById('auth-section').style.display = 'none';
     document.getElementById('sidebar-nav').style.display = 'flex';
@@ -135,15 +146,13 @@ function showSection(sectionId) {
         const section = document.getElementById(id);
         if (section) {
             if (id === sectionId) {
-                section.style.display = 'block';
                 setTimeout(() => {
-                    section.classList.add('active');
-                }, 10);
+                    section.style.display = 'block';
+                    setTimeout(() => section.classList.add('active'), 10);
+                }, 300); // Ждем завершения анимации закрытия
             } else {
                 section.classList.remove('active');
-                setTimeout(() => {
-                    section.style.display = 'none';
-                }, 300);
+                setTimeout(() => section.style.display = 'none', 300);
             }
         }
     });
