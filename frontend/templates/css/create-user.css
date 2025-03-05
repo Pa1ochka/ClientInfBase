@@ -1,16 +1,15 @@
 #create-user-section.card {
-    background: var(--light);
-    border-radius: 20px;
+    background: #fff;
+    border-radius: 16px;
     padding: 30px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    transition: var(--transition);
-    border: 1px solid rgba(0, 0, 0, 0.04);
-    animation: fadeIn 0.5s ease-out, slideUp 0.5s ease-out;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    animation: fadeIn 0.5s ease-out;
 }
 
 #create-user-section h2 {
     font-size: 1.875rem;
-    color: var(--dark);
+    color: #2c3e50;
     margin-bottom: 25px;
     display: flex;
     align-items: center;
@@ -32,58 +31,59 @@
 #create-user-username,
 #create-user-password {
     width: 100%;
-    padding: 16px 48px 16px 16px;
-    font-size: 16px;
-    border: 1px solid var(--gray-light);
+    padding: 14px 40px 14px 14px;
+    font-size: 15px;
+    border: 1px solid #eef2f7;
     border-radius: 12px;
     background: #fff;
-    transition: var(--transition);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 #create-user-email:focus,
 #create-user-username:focus,
 #create-user-password:focus {
     outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(79, 108, 255, 0.15);
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
 }
 
 #create-user-section .input-group .material-icons {
     position: absolute;
-    right: 16px;
+    right: 14px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--gray);
+    color: #7b8794;
 }
 
 #create-user-section .btn {
-    padding: 14px 20px;
-    font-size: 16px;
+    padding: 10px 20px; /* Уменьшено с 14px 24px */
+    font-size: 14px; /* Уменьшено с 16px */
     border: none;
-    border-radius: 12px;
+    border-radius: 8px; /* Уменьшено с 12px */
     cursor: pointer;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
     color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    transition: var(--transition);
-    font-weight: 500;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    gap: 8px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 200px; /* Уменьшено с 300px */
 }
 
 #create-user-section .btn:hover {
-    background: var(--primary-dark);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(79, 108, 255, 0.3);
+    background: #2980b9;
+    transform: translateY(-2px); /* Уменьшено с -3px */
+    box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3); /* Уменьшено с 12px 28px */
 }
 
 #create-user-message {
     margin-top: 20px;
     font-size: 14px;
     padding: 12px 16px;
-    border-radius: 12px;
+    border-radius: 8px;
     background: #fde8e8;
     color: #ff4757;
     border-left: 4px solid #ff4757;
@@ -103,7 +103,7 @@
 
 #create-user-section .tooltip {
     visibility: hidden;
-    background: var(--dark);
+    background: #2c3e50;
     color: #fff;
     text-align: center;
     border-radius: 8px;
@@ -116,7 +116,7 @@
     font-size: 12px;
     opacity: 0;
     transition: opacity 0.3s;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     white-space: nowrap;
 }
 
@@ -125,15 +125,38 @@
     opacity: 1;
 }
 
+#create-user-section .btn-primary {
+    padding: 10px 20px; /* Уменьшено с 14px 24px */
+    font-size: 14px; /* Уменьшено с 15px */
+    border: none;
+    border-radius: 8px; /* Уменьшено с 12px */
+    cursor: pointer;
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 180px; /* Уменьшено с 300px */
+    height: 40px; /* Фиксированная высота для аккуратности */
+}
+
+#create-user-section .btn-primary:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3);
+}
+
 @media (max-width: 768px) {
     #create-user-section.card {
         padding: 20px;
     }
-
     #create-user-section h2 {
         font-size: 1.5rem;
     }
-
     #create-user-form {
         grid-template-columns: 1fr;
     }

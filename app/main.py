@@ -268,10 +268,24 @@ def update_client(
 ):
     if not current_user.is_admin:
         raise HTTPException(status_code=403, detail="Только администраторы могут редактировать данные клиентов")
-    updated_client = crud.update_client(db, postal_address, client, current_user)
-    if updated_client is None:
+    db_client = crud.get_client_by_address(db, postal_address)
+    if not db_client:
         raise HTTPException(status_code=404, detail="Client not found")
-    return updated_client
+
+    # Если postal_address изменён, обновляем его
+    new_postal_address = client.postal_address if 'postal_address' in client.dict(exclude_unset=True) else postal_address
+    if new_postal_address != postal_address:
+        existing_client = crud.get_client_by_address(db, new_postal_address)
+        if existing_client and existing_client.id != db_client.id:
+            raise HTTPException(status_code=400, detail="Клиент с таким адресом уже существует")
+        db_client.postal_address = new_postal_address
+
+    for var, value in client.dict(exclude_unset=True).items():
+        if var != 'postal_address':  # Исключаем postal_address из общего цикла, так как уже обработали
+            setattr(db_client, var, value)
+    db.commit()
+    db.refresh(db_client)
+    return db_client
 
 @app.get("/clients/search/", response_model=List[schemas.Client])
 def search_clients(
@@ -283,6 +297,77 @@ def search_clients(
 ):
     print(f"User {current_user.username} searched for: {search}")
     return crud.search_clients(db, search, skip, limit)
+
+
+@app.delete("/clients/{postal_address}", status_code=204)
+def delete_client(
+    postal_address: str,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Только администраторы могут удалять клиентов")
+    db_client = crud.get_client_by_address(db, postal_address)
+    if not db_client:
+        raise HTTPException(status_code=404, detail="Client not found")
+    db.delete(db_client)
+    db.commit()
+    return None
+
+@app.get("/users/", response_model=List[schemas.User])
+def read_users(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Только администраторы могут просматривать список пользователей")
+    return db.query(models.User).all()
+
+
+@app.get("/users/{user_id}", response_model=schemas.User)
+def read_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Только администраторы могут просматривать данные пользователей")
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+@app.put("/users/{user_id}", response_model=schemas.User)
+def update_user(
+    user_id: int,
+    user: schemas.UserUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Только администраторы могут редактировать пользователей")
+    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if not verify_password(user.current_password, current_user.hashed_password):
+        raise HTTPException(status_code=400, detail="Incorrect current password")
+
+    if db_user.email != user.email and crud.get_user_by_email(db, user.email):
+        raise HTTPException(status_code=400, detail="Email already registered")
+    if db_user.username != user.username and db.query(models.User).filter(models.User.username == user.username).first():
+        raise HTTPException(status_code=400, detail="Username already taken")
+
+    db_user.email = user.email
+    db_user.username = user.username
+    if user.password:
+        db_user.hashed_password = get_password_hash(user.password)
+    if 'is_admin' in user.dict(exclude_unset=True):
+        db_user.is_admin = user.is_admin
+
+    db.commit()
+    db.refresh(db_user)
+    return db_user
 
 def create_first_admin():
     db = next(get_db())

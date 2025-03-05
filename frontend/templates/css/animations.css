@@ -66,7 +66,7 @@
 
 /* Smooth Transitions */
 .card, .modal-content, .auth-card, .sidebar, .input-group, .btn {
-    transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, background-color 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 /* Table Row Animation */
@@ -86,9 +86,9 @@
     display: inline-block;
     width: 50px;
     height: 50px;
-    border: 3px solid rgba(76, 175, 80, 0.3);
+    border: 3px solid rgba(52, 199, 89, 0.3);
     border-radius: 50%;
-    border-top-color: #4CAF50;
+    border-top-color: #34c759;
     animation: spin 1s ease-in-out infinite;
     margin: 30px auto;
 }
@@ -114,12 +114,12 @@
     bottom: 20px;
     right: 20px;
     padding: 15px 20px;
-    border-radius: 5px;
+    border-radius: 8px;
     display: none;
     justify-content: space-between;
     align-items: center;
     z-index: 2000;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     transform: translateY(20px);
     opacity: 0;
     transition: transform 0.3s ease, opacity 0.3s ease;
@@ -133,17 +133,17 @@
 }
 
 .toast.success {
-    background-color: #34c759;
+    background: #34c759;
     color: white;
 }
 
 .toast.error {
-    background-color: #ff4757;
+    background: #ff4757;
     color: white;
 }
 
 .toast.info {
-    background-color: #6cd4ff;
+    background: #6cd4ff;
     color: white;
 }
 
@@ -160,39 +160,4 @@
     opacity: 0;
     animation: fadeIn 0.5s forwards;
     animation-delay: 0.2s;
-}
-
-.table-wrapper {
-    overflow-x: auto;
-    max-width: 100%;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-}
-
-table th,
-table td {
-    padding: 0.75rem;
-    border-bottom: 1px solid #ddd;
-    text-align: left;
-}
-
-table th {
-    background-color: #f5f5f5;
-    font-weight: 500;
-    color: #333;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-table tbody tr {
-    transition: background-color 0.2s;
-}
-
-table tbody tr:hover {
-    background-color: #f9f9f9;
 }

@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, Date, Float, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Date, Float, Boolean, ForeignKey, func, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
+import datetime
 
 Base = declarative_base()
 
@@ -15,7 +16,7 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     reset_code = Column(String, nullable=True)
     avatar_url = Column(String, nullable=True)
-    created_at = Column(Date, nullable=True, default=None)  # Добавлено для даты регистрации
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)  # Изменено на nullable=False
 
     clients = relationship("Client", back_populates="creator")
 

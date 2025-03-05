@@ -1,9 +1,9 @@
 #clients-section.card {
-    background: var(--light);
-    border-radius: 20px;
+    background: #fff;
+    border-radius: 16px;
     padding: 32px;
-    box-shadow: var(--shadow);
-    transition: var(--transition);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 #clients-section .section-header {
@@ -12,17 +12,16 @@
 
 #clients-section h2 {
     font-size: 1.875rem;
-    color: var(--dark);
+    color: #2c3e50;
     margin-bottom: 10px;
     font-weight: 700;
-    letter-spacing: -0.02em;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 #clients-section .section-subtitle {
-    color: var(--gray);
+    color: #7b8794;
     font-size: 1rem;
 }
 
@@ -41,16 +40,16 @@
     width: 100%;
     padding: 14px 40px 14px 14px;
     font-size: 15px;
-    border: 1px solid var(--gray-light);
+    border: 1px solid #eef2f7;
     border-radius: 12px;
     background: #fff;
-    transition: var(--transition);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 #clients-search-term:focus {
     outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(79, 108, 255, 0.15);
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
 }
 
 #clients-section .input-group .material-icons {
@@ -58,40 +57,37 @@
     right: 14px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--gray);
-    pointer-events: none;
+    color: #7b8794;
 }
 
 #clients-search-btn {
-    padding: 12px 24px;
-    font-size: 16px;
+    padding: 10px 20px; /* Уменьшено с 12px 24px */
+    font-size: 14px; /* Уменьшено с 16px */
     font-weight: 600;
     border: none;
-    border-radius: 12px;
+    border-radius: 8px; /* Уменьшено с 12px для аккуратности */
     cursor: pointer;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
     color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    transition: var(--transition);
-    box-shadow: var(--shadow);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    gap: 6px; /* Уменьшено с 8px */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    height: 40px; /* Фиксированная высота для ровности */
 }
 
 #clients-search-btn:hover {
-    background: var(--primary-dark);
-    transform: translateY(-3px);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+    background: #2980b9;
+    transform: translateY(-2px); /* Уменьшено с -3px */
+    box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3); /* Уменьшено с 12px 28px */
 }
-
 .table-container {
-    background: var(--light);
-    border-radius: 16px;
+    background: #fff;
+    border-radius: 12px;
     padding: 8px;
-    box-shadow: var(--shadow);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 #clients-section .table-wrapper {
@@ -113,17 +109,15 @@
 #clients-section td {
     padding: 18px 20px;
     text-align: left;
-    border-bottom: 1px solid var(--gray-light);
+    border-bottom: 1px solid #eef2f7;
     font-size: 15px;
     min-width: 100px;
 }
 
 #clients-section th {
-    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+    background: linear-gradient(90deg, #3498db 0%, #2980b9 100%);
     color: #fff;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
     position: sticky;
     top: 0;
     white-space: nowrap;
@@ -138,7 +132,7 @@
 }
 
 #clients-section tbody tr:hover {
-    background: rgba(79, 108, 255, 0.05);
+    background: rgba(52, 152, 219, 0.05);
 }
 
 #clients-section .btn-edit {
@@ -147,19 +141,19 @@
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    background: var(--primary);
+    background: #3498db;
     color: #fff;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
-    transition: var(--transition);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 #clients-section .btn-edit:hover {
-    background: var(--primary-dark);
+    background: #2980b9;
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(79, 108, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
 }
 
 .pagination-container {
@@ -172,218 +166,165 @@
 
 #page-info {
     font-size: 14px;
-    color: var(--gray);
+    color: #7b8794;
 }
 
 #current-page, #total-pages {
     font-weight: 600;
-    color: var(--primary);
+    color: #3498db;
 }
 
 #prev-page, #next-page {
-    padding: 10px 16px;
+    padding: 8px 16px;
     font-size: 14px;
+    font-weight: 600;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    background: transparent;
-    color: var(--primary);
-    border: 2px solid var(--primary);
-    display: inline-flex;
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: #fff;
+    display: flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
-    transition: var(--transition);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    height: 40px; /* Фиксированная высота для аккуратности */
 }
 
 #prev-page:hover, #next-page:hover {
-    background: var(--primary);
-    color: #fff;
+    background: #2980b9;
     transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3);
 }
 
 #prev-page[disabled], #next-page[disabled] {
-    opacity: 0.5;
+    background: #bdc3c7;
     cursor: not-allowed;
-    pointer-events: none;
+    box-shadow: none;
+    opacity: 0.6;
 }
 
-/* Стили для модального окна редактирования клиента */
+#prev-page .material-icons, #next-page .material-icons {
+    font-size: 18px;
+}
+
 #edit-modal {
     display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(44, 62, 80, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#edit-modal.active {
+    opacity: 1;
 }
 
 #edit-modal .modal-content {
-    max-width: 800px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 30px;
+    width: 90%;
+    max-width: 700px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    animation: slideInUp 0.4s ease-out;
 }
 
-#edit-modal h3 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--primary);
-    margin-bottom: 25px;
+#edit-modal header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#edit-modal h2 {
+    font-size: 1.75rem;
+    color: #2c3e50;
+    font-weight: 700;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 12px;
 }
 
 #edit-client-form {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 25px;
+    gap: 20px;
 }
 
-#edit-modal .form-section {
-    background: var(--gray-light);
-    padding: 20px;
-    border-radius: 12px;
-    border: 1px solid var(--gray-light);
-}
-
-#edit-modal .form-section.full-width {
-    grid-column: 1 / -1;
-}
-
-#edit-modal .form-section-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--primary);
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--gray-light);
-}
-
-#edit-modal .input-group {
+#edit-client-form .input-group {
     position: relative;
-    margin-bottom: 20px;
 }
 
-#edit-modal .input-group:last-child {
-    margin-bottom: 0;
-}
-
-#edit-client-postal-address,
-#edit-client-account-number,
-#edit-client-owner-name,
-#edit-client-email,
-#edit-client-phone-number,
-#edit-client-inn,
-#edit-client-connected-power,
-#edit-client-passport-data,
-#edit-client-snils,
-#edit-client-connection-date,
-#edit-client-power-source,
-#edit-client-additional-info {
+#edit-client-form input,
+#edit-client-form textarea {
     width: 100%;
-    padding: 14px 40px 14px 14px;
+    padding: 12px 40px 12px 12px;
     font-size: 15px;
-    border: 1px solid var(--gray-light);
+    border: 1px solid #eef2f7;
     border-radius: 10px;
     background: #fff;
-    transition: var(--transition);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-#edit-client-postal-address:focus,
-#edit-client-account-number:focus,
-#edit-client-owner-name:focus,
-#edit-client-email:focus,
-#edit-client-phone-number:focus,
-#edit-client-inn:focus,
-#edit-client-connected-power:focus,
-#edit-client-passport-data:focus,
-#edit-client-snils:focus,
-#edit-client-connection-date:focus,
-#edit-client-power-source:focus,
-#edit-client-additional-info:focus {
+#edit-client-form input:focus,
+#edit-client-form textarea:focus {
     outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(79, 108, 255, 0.15);
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
 }
 
-#edit-client-additional-info {
+#edit-client-form textarea {
     resize: vertical;
     min-height: 100px;
 }
 
-#edit-modal .input-group .material-icons {
+#edit-client-form .material-icons {
     position: absolute;
-    right: 14px;
+    right: 12px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--gray);
-    pointer-events: none;
+    color: #7b8794;
 }
 
-#edit-modal .input-group textarea + .material-icons {
-    top: 25px;
-    transform: none;
-}
-
-.form-actions {
-    display: flex;
-    gap: 15px;
-    margin-top: 30px;
-}
-
-#edit-modal .btn {
+#edit-client-form .btn-primary {
     padding: 12px 24px;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
     border: none;
     border-radius: 12px;
     cursor: pointer;
-    display: inline-flex;
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: #fff;
+    display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    transition: var(--transition);
-    flex: 1;
-    max-width: 250px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-#edit-modal .btn-primary {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    color: #fff;
-    box-shadow: var(--shadow);
-}
-
-#edit-modal .btn-primary:hover {
-    background: var(--primary-dark);
+#edit-client-form .btn-primary:hover {
+    background: #2980b9;
     transform: translateY(-3px);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
-}
-
-#edit-modal .btn-secondary {
-    background: transparent;
-    color: var(--gray);
-    border: 1px solid var(--gray-light);
-}
-
-#edit-modal .btn-secondary:hover {
-    background: var(--gray-light);
-    color: var(--dark);
-    transform: translateY(-2px);
-}
-
-#edit-modal .btn-danger {
-    background: var(--danger);
-    color: #fff;
-    box-shadow: var(--shadow);
-}
-
-#edit-modal .btn-danger:hover {
-    background: #d62b38;
-    transform: translateY(-3px);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 12px 28px rgba(52, 152, 219, 0.3);
 }
 
 #edit-client-message {
     margin-top: 20px;
     font-size: 14px;
     padding: 12px 16px;
-    border-radius: 12px;
+    border-radius: 8px;
     background: #fde8e8;
     color: #ff4757;
     border-left: 4px solid #ff4757;
@@ -401,85 +342,97 @@
     display: block;
 }
 
-#edit-modal .tooltip {
-    visibility: hidden;
-    background: var(--dark);
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 8px 12px;
+#edit-modal .close {
     position: absolute;
-    z-index: 1;
-    bottom: 125%;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 12px;
-    opacity: 0;
-    transition: opacity 0.3s;
-    white-space: nowrap;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-#edit-modal .input-group:hover .tooltip {
-    visibility: visible;
-    opacity: 1;
-}
-
-/* Модальное окно деталей клиента */
-.client-details-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(31, 42, 68, 0.6);
-    backdrop-filter: blur(4px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.client-details-modal.active {
-    opacity: 1;
-}
-
-.client-details-modal .modal-content {
-    background: var(--light);
-    border-radius: 20px;
-    padding: 40px;
-    max-width: 700px;
-    width: 90%;
-    max-height: 85vh;
-    overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(31, 42, 68, 0.25);
-    animation: slideInUp 0.4s ease-out;
-    position: relative;
-}
-
-.client-details-modal .close {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    font-size: 24px;
-    color: var(--gray);
+    top: 15px;
+    right: 15px;
+    font-size: 28px;
+    color: #7b8794;
     cursor: pointer;
-    background: var(--gray-light);
-    width: 36px;
-    height: 36px;
+    background: #eef2f7;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     border: none;
-    transition: var(--transition);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+#edit-modal .close:hover {
+    color: #2c3e50;
+    background: #bdc3c7;
+    transform: rotate(90deg);
+}
+
+@media (max-width: 768px) {
+    #edit-client-form {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    #clients-section th:not(:nth-child(1)):not(:nth-child(2)):not(:nth-child(6)),
+    #clients-section td:not(:nth-child(1)):not(:nth-child(2)):not(:nth-child(6)) {
+        display: none;
+    }
+}
+
+.client-details-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(44, 62, 80, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.client-details-modal.active {
+    display: flex;
+    opacity: 1;
+}
+
+.client-details-modal .modal-content {
+    background: #fff;
+    border-radius: 16px;
+    padding: 30px;
+    max-width: 700px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    animation: slideInUp 0.4s ease-out;
+}
+
+.client-details-modal .close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 28px;
+    color: #7b8794;
+    cursor: pointer;
+    background: #eef2f7;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .client-details-modal .close:hover {
-    color: var(--dark);
-    background: var(--gray-light);
+    color: #2c3e50;
+    background: #bdc3c7;
     transform: rotate(90deg);
 }
 
@@ -489,26 +442,60 @@
 
 .client-details p {
     margin: 10px 0;
-    color: var(--gray);
+    color: #7b8794;
 }
 
 .client-details p strong {
-    color: var(--dark);
+    color: #2c3e50;
     margin-right: 5px;
 }
 
-@media (max-width: 768px) {
-    #edit-client-form {
-        grid-template-columns: 1fr;
-    }
-    .form-actions {
-        flex-direction: column;
-    }
-    #edit-modal .btn {
-        max-width: 100%;
-    }
-    #clients-section th:not(:nth-child(1)):not(:nth-child(2)):not(:nth-child(6)),
-    #clients-section td:not(:nth-child(1)):not(:nth-child(2)):not(:nth-child(6)) {
-        display: none;
-    }
+#clients-section .btn-edit,
+#clients-section .btn-danger,
+#clients-section .btn-secondary {
+    padding: 8px;
+    font-size: 14px;
+    border: none;
+    border-radius: 50%; /* Круглые кнопки */
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#clients-section .btn-edit {
+    background: #3498db;
+    color: #fff;
+}
+
+#clients-section .btn-edit:hover {
+    background: #2980b9;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+#clients-section .btn-danger {
+    background: #ff4757;
+    color: #fff;
+}
+
+#clients-section .btn-danger:hover {
+    background: #e74c3c;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+}
+
+#clients-section .btn-secondary {
+    background: #6cd4ff;
+    color: #fff;
+}
+
+#clients-section .btn-secondary:hover {
+    background: #5bc0eb;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(108, 212, 255, 0.3);
 }

@@ -24,12 +24,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         { fileName: 'edit-client', container: '#modal-container', sectionId: 'edit-modal' },
         { fileName: 'profile', container: '#modal-container', sectionId: 'profile-modal' },
         { fileName: 'create-client', container: '#modal-container', sectionId: 'address-modal' },
-        { fileName: 'edit-client', container: '#modal-container', sectionId: 'edit-address-modal' }
+        { fileName: 'edit-client', container: '#modal-container', sectionId: 'edit-address-modal' },
+        { fileName: 'create-user', container: '#modal-container', sectionId: 'edit-user-modal' } // Добавлено
     ];
 
-    Promise.all(sectionsToLoad.map(section =>
+    await Promise.all(sectionsToLoad.map(section =>
         loadSection(section.fileName, section.container, section.sectionId)
     )).then(() => {
+        console.log('All sections loaded successfully');
         initializeAuthListeners();
         initializeCreateUserListeners();
         initializeCreateClientListeners();
@@ -64,16 +66,17 @@ function checkAuthStatus() {
     const authSection = document.getElementById('auth-section');
     const sidebar = document.getElementById('sidebar-nav');
 
-    if (token) {
+    if (token && token !== 'null') {
         fetchCurrentUser().then(() => {
             showManagementSection();
             showSection('clients-section');
             authSection.style.display = 'none';
-        }).catch(() => {
-            console.error('Не удалось загрузить данные пользователя при старте');
+        }).catch((error) => {
+            console.error('Не удалось загрузить данные пользователя при старте:', error);
             authSection.style.display = 'flex';
             setTimeout(() => authSection.classList.add('active'), 10);
             sidebar.style.display = 'none';
+            localStorage.removeItem('token'); // Удаляем невалидный токен
         });
     } else {
         authSection.style.display = 'flex';
@@ -122,9 +125,10 @@ async function fetchCurrentUser() {
         headers: { 'Authorization': `Bearer ${token}` }
     });
     currentUsername = response.data.username;
+    document.getElementById('sidebar-avatar').src = response.data.avatar_url || '/static/img/default-avatar.png';
+    document.getElementById('current-user').textContent = currentUsername;
     return response.data;
 }
-
 function showSection(sectionId) {
     const sections = ['create-user-section', 'create-client-section', 'clients-section'];
     sections.forEach(id => {
@@ -164,6 +168,7 @@ function updateSidebarMenu() {
         document.getElementById('clients-btn').style.display = 'flex';
         document.getElementById('profile-btn').style.display = 'flex';
         document.getElementById('logout-btn').style.display = 'flex';
+        document.getElementById('sidebar-avatar').src = user.avatar_url || '/static/img/default-avatar.png';
     })
     .catch(error => {
         console.error('Ошибка получения данных пользователя:', error);

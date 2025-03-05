@@ -1,57 +1,73 @@
 function initializeProfileListeners() {
-document.getElementById('profile-btn').addEventListener('click', async () => {
-    if (!token) {
-        console.error('No token found, please log in');
-        showToast('Пожалуйста, войдите в систему', 'error');
+    const profileBtn = document.getElementById('profile-btn');
+    if (!profileBtn) {
+        console.error('Profile button not found');
         return;
     }
 
-    try {
-        const response = await axios.get(`${API_URL}/users/me`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+    profileBtn.addEventListener('click', async () => {
+        if (!token) {
+            console.error('No token found, please log in');
+            showToast('Пожалуйста, войдите в систему', 'error');
+            return;
+        }
+
+        try {
+            const response = await axios.get(`${API_URL}/users/me`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const user = response.data;
+
+            document.getElementById('profile-view-username').textContent = user.username;
+            document.getElementById('profile-view-email').textContent = user.email;
+            document.getElementById('profile-view-role').textContent = user.is_admin ? 'Администратор' : 'Пользователь';
+            document.getElementById('profile-view-created').textContent = user.created_at ? new Date(user.created_at).toLocaleDateString() : '-';
+            document.getElementById('profile-avatar-img').src = user.avatar_url || '/static/img/default-avatar.png';
+
+            document.getElementById('profile-email').value = user.email;
+            document.getElementById('profile-username').value = user.username;
+
+            toggleProfileSection('profile-card');
+            showModal('profile-modal');
+        } catch (error) {
+            console.error('Error fetching profile:', error.response?.data || error.message);
+            showError('profile-message', error);
+            showToast('Ошибка загрузки профиля', 'error');
+        }
+    });
+
+    const closeModal = document.getElementById('profile-close-modal');
+    if (closeModal) closeModal.addEventListener('click', () => hideModal('profile-modal'));
+
+    const editBtn = document.getElementById('profile-edit-btn');
+    if (editBtn) editBtn.addEventListener('click', () => toggleProfileSection('profile-edit-form'));
+
+    const passwordBtn = document.getElementById('profile-password-btn');
+    if (passwordBtn) passwordBtn.addEventListener('click', () => toggleProfileSection('profile-password-form'));
+
+    const cancelBtn = document.getElementById('profile-cancel-btn');
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            toggleProfileSection('profile-card');
+            resetAvatarStatus(); // Вызываем только если элементы доступны
         });
-        const user = response.data;
-
-        document.getElementById('profile-view-username').textContent = user.username;
-        document.getElementById('profile-view-email').textContent = user.email;
-        document.getElementById('profile-view-role').textContent = user.is_admin ? 'Администратор' : 'Пользователь';
-        document.getElementById('profile-view-created').textContent = user.created_at ? new Date(user.created_at).toLocaleDateString() : '-';
-        document.getElementById('profile-avatar-img').src = user.avatar_url || '/static/img/default-avatar.png';
-
-        document.getElementById('profile-email').value = user.email;
-        document.getElementById('profile-username').value = user.username;
-
-        console.log('Toggling section and showing modal');
-        toggleProfileSection('profile-card');
-        showModal('profile-modal');
-    } catch (error) {
-        console.error('Error fetching profile:', error.response?.data || error.message);
-        showError('profile-message', error);
-        showToast('Ошибка загрузки профиля', 'error');
     }
-});
-    document.getElementById('profile-close-modal').addEventListener('click', () => hideModal('profile-modal'));
 
-    document.getElementById('profile-edit-btn').addEventListener('click', () => toggleProfileSection('profile-edit-form'));
-    document.getElementById('profile-password-btn').addEventListener('click', () => toggleProfileSection('profile-password-form'));
+    const passwordCancelBtn = document.getElementById('profile-password-cancel-btn');
+    if (passwordCancelBtn) passwordCancelBtn.addEventListener('click', () => toggleProfileSection('profile-card'));
 
-    document.getElementById('profile-cancel-btn').addEventListener('click', () => {
-        toggleProfileSection('profile-card');
-        resetAvatarStatus();
-    });
-
-    document.getElementById('profile-password-cancel-btn').addEventListener('click', () => toggleProfileSection('profile-card'));
-
-    // Загрузка аватара
-    document.getElementById('profile-avatar-edit').addEventListener('click', () => {
+    const avatarEdit = document.getElementById('profile-avatar-edit');
+    if (avatarEdit) avatarEdit.addEventListener('click', () => {
         document.getElementById('profile-avatar-upload').click();
     });
 
-    document.getElementById('upload-avatar-btn').addEventListener('click', () => {
+    const uploadAvatarBtn = document.getElementById('upload-avatar-btn');
+    if (uploadAvatarBtn) uploadAvatarBtn.addEventListener('click', () => {
         document.getElementById('profile-avatar-upload').click();
     });
 
-    document.getElementById('profile-avatar-upload').addEventListener('change', async (e) => {
+    const avatarUpload = document.getElementById('profile-avatar-upload');
+    if (avatarUpload) avatarUpload.addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (file) {
             if (file.size > 20 * 1024 * 1024) {
@@ -83,8 +99,8 @@ document.getElementById('profile-btn').addEventListener('click', async () => {
         }
     });
 
-    // Удаление аватара
-    document.getElementById('profile-avatar-delete').addEventListener('click', async () => {
+    const avatarDelete = document.getElementById('profile-avatar-delete');
+    if (avatarDelete) avatarDelete.addEventListener('click', async () => {
         if (confirm('Вы уверены, что хотите удалить аватар?')) {
             try {
                 const response = await axios.delete(`${API_URL}/users/me/avatar`, {
@@ -99,7 +115,8 @@ document.getElementById('profile-btn').addEventListener('click', async () => {
         }
     });
 
-    document.getElementById('profile-edit-form').addEventListener('submit', async (e) => {
+    const editForm = document.getElementById('profile-edit-form');
+    if (editForm) editForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const userData = {
             email: document.getElementById('profile-email').value,
@@ -119,7 +136,8 @@ document.getElementById('profile-btn').addEventListener('click', async () => {
         }
     });
 
-    document.getElementById('profile-password-form').addEventListener('submit', async (e) => {
+    const passwordForm = document.getElementById('profile-password-form');
+    if (passwordForm) passwordForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const oldPassword = document.getElementById('profile-old-password').value;
         const newPassword = document.getElementById('profile-new-password').value;
@@ -143,6 +161,7 @@ document.getElementById('profile-btn').addEventListener('click', async () => {
         }
     });
 }
+
 
 function toggleProfileSection(activeSectionId) {
     const sections = ['profile-card', 'profile-edit-form', 'profile-password-form'];
@@ -188,7 +207,10 @@ function showError(elementId, error) {
 
 function resetAvatarStatus() {
     const status = document.getElementById('avatar-upload-status');
-    status.textContent = '';
-    status.classList.remove('success', 'error');
-    document.getElementById('profile-avatar-upload').value = '';
+    if (status) {
+        status.textContent = '';
+        status.classList.remove('success', 'error');
+    }
+    const avatarUpload = document.getElementById('profile-avatar-upload');
+    if (avatarUpload) avatarUpload.value = '';
 }

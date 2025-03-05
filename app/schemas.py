@@ -12,6 +12,7 @@ class UserCreate(UserBase):
 class UserUpdate(UserBase):
     current_password: str = Field(..., min_length=8, description="Текущий пароль для подтверждения изменений")
     password: Optional[str] = Field(None, min_length=8, description="Новый пароль (опционально)")
+    is_admin: Optional[bool] = None  # Добавлено для редактирования прав
 
 class User(UserBase):
     id: int
