@@ -10,7 +10,8 @@
             <fieldset class="form-section">
                 <legend class="form-section-title">Основная информация</legend>
                 <div class="input-group">
-                    <input type="text" id="create-client-postal-address" placeholder="Нажмите для ввода адреса или укажите идентификатор" required>
+                    <input type="text" id="create-client-postal-address"
+                           placeholder="Нажмите для ввода адреса или укажите идентификатор" required>
                     <span class="material-icons">location_on</span>
                     <span class="tooltip">Введите адрес (от 5 до 200 символов) или включите чекбокс для кадастрового номера</span>
                 </div>
@@ -27,6 +28,16 @@
                     <input type="text" id="create-client-owner-name" placeholder="Имя владельца" required>
                     <span class="material-icons">person</span>
                     <span class="tooltip">От 1 до 100 символов</span>
+                </div>
+                <div class="input-group">
+                    <select id="create-client-department" required>
+                        <option value="" disabled selected>Выберите отдел</option>
+                        <option value="ЮЭС">ЮЭС</option>
+                        <option value="ЦЭС">ЦЭС</option>
+                        <option value="СЭС">СЭС</option>
+                    </select>
+                    <span class="material-icons">business</span>
+                    <span class="tooltip">Отдел клиента</span>
                 </div>
             </fieldset>
 
@@ -90,7 +101,8 @@
             <fieldset class="form-section full-width">
                 <legend class="form-section-title">Дополнительная информация</legend>
                 <div class="input-group">
-                    <textarea id="create-client-additional-info" placeholder="Дополнительная информация" rows="3"></textarea>
+                    <textarea id="create-client-additional-info" placeholder="Дополнительная информация"
+                              rows="3"></textarea>
                     <span class="material-icons">info</span>
                     <span class="tooltip">До 500 символов (опционально)</span>
                 </div>

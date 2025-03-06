@@ -18,6 +18,16 @@
             <span class="material-icons">lock</span>
             <span class="tooltip">Минимум 8 символов</span>
         </div>
+        <div class="input-group">
+            <select id="create-user-department" required>
+                <option value="" disabled selected>Выберите отдел</option>
+                <option value="ЮЭС">ЮЭС</option>
+                <option value="ЦЭС">ЦЭС</option>
+                <option value="СЭС">СЭС</option>
+            </select>
+            <span class="material-icons">business</span>
+            <span class="tooltip">Отдел пользователя</span>
+        </div>
         <button type="submit" class="btn btn-primary">Создать пользователя</button>
     </form>
     <div id="create-user-message" class="message"></div>

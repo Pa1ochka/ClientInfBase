@@ -1,5 +1,4 @@
 from datetime import date
-
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from typing import Optional, List
@@ -8,7 +7,6 @@ from . import models, schemas
 from .security import get_password_hash, verify_password
 
 def check_admin_privileges(current_user: models.User) -> None:
-    """Проверка, является ли пользователь администратором."""
     if not current_user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -16,11 +14,9 @@ def check_admin_privileges(current_user: models.User) -> None:
         )
 
 def get_user_by_email(db: Session, email: str) -> Optional[models.User]:
-    """Получить пользователя по email."""
     return db.query(models.User).filter(models.User.email == email).first()
 
 def create_user(db: Session, user: schemas.UserCreate, current_user: models.User) -> models.User:
-    """Создать нового пользователя (доступно только администратору)."""
     check_admin_privileges(current_user)
     existing_user = get_user_by_email(db, user.email)
     if existing_user:
@@ -32,7 +28,8 @@ def create_user(db: Session, user: schemas.UserCreate, current_user: models.User
         username=user.username,
         hashed_password=hashed_password,
         is_admin=False,
-        is_active=True
+        is_active=True,
+        department=user.department  # Указываем отдел
     )
     db.add(db_user)
     db.commit()
@@ -40,7 +37,6 @@ def create_user(db: Session, user: schemas.UserCreate, current_user: models.User
     return db_user
 
 def update_user(db: Session, user: schemas.UserUpdate, current_user: models.User) -> models.User:
-    """Обновить профиль текущего пользователя с проверкой текущего пароля."""
     db_user = db.query(models.User).filter(models.User.id == current_user.id).first()
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -60,14 +56,17 @@ def update_user(db: Session, user: schemas.UserUpdate, current_user: models.User
     db_user.username = user.username
     if user.password:
         db_user.hashed_password = get_password_hash(user.password)
+    if user.department:  # Обновляем отдел, если указан
+        db_user.department = user.department
 
     db.commit()
     db.refresh(db_user)
     return db_user
 
 def create_client(db: Session, client: schemas.ClientCreate, current_user: models.User) -> models.Client:
-    """Создать нового клиента (доступно только администратору)."""
-    check_admin_privileges(current_user)
+    if not current_user.is_admin and client.department != current_user.department:
+        raise HTTPException(status_code=403, detail="Вы можете создавать клиентов только в своём отделе")
+
     existing_client = get_client_by_address(db, client.postal_address)
     if existing_client:
         raise HTTPException(status_code=400, detail="Адрес уже существует")
@@ -78,20 +77,23 @@ def create_client(db: Session, client: schemas.ClientCreate, current_user: model
     db.refresh(db_client)
     return db_client
 
-def get_clients(db: Session, skip: int = 0, limit: int = 100) -> List[models.Client]:
-    """Получить список клиентов (доступно всем)."""
-    return db.query(models.Client).offset(skip).limit(limit).all()
+def get_clients(db: Session, current_user: models.User, skip: int = 0, limit: int = 100) -> List[models.Client]:
+    query = db.query(models.Client)
+    if not current_user.is_admin:  # Фильтр по отделу для сотрудников
+        query = query.filter(models.Client.department == current_user.department)
+    return query.offset(skip).limit(limit).all()
 
 def get_client_by_address(db: Session, postal_address: str) -> Optional[models.Client]:
-    """Получить клиента по адресу (доступно всем)."""
     return db.query(models.Client).filter(models.Client.postal_address == postal_address).first()
 
 def update_client(db: Session, postal_address: str, client: schemas.ClientUpdate, current_user: models.User) -> Optional[models.Client]:
-    """Обновить клиента (доступно только администратору)."""
-    check_admin_privileges(current_user)
+    check_admin_privileges(current_user)  # Только админы могут обновлять
     db_client = get_client_by_address(db, postal_address)
     if not db_client:
         raise HTTPException(status_code=404, detail="Client not found")
+
+    if client.department and client.department != db_client.department:
+        raise HTTPException(status_code=403, detail="Изменение отдела клиента не поддерживается в этой версии")
 
     for var, value in client.dict(exclude_unset=True).items():
         setattr(db_client, var, value)
@@ -99,9 +101,9 @@ def update_client(db: Session, postal_address: str, client: schemas.ClientUpdate
     db.refresh(db_client)
     return db_client
 
-
 def search_clients(
         db: Session,
+        current_user: models.User,
         search_term: Optional[str] = None,
         connection_date: Optional[date] = None,
         connected_power_min: Optional[float] = None,
@@ -110,6 +112,8 @@ def search_clients(
         limit: int = 10
 ) -> List[models.Client]:
     query = db.query(models.Client)
+    if not current_user.is_admin:  # Фильтр по отделу для сотрудников
+        query = query.filter(models.Client.department == current_user.department)
 
     if search_term:
         try:

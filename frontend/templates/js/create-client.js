@@ -5,7 +5,7 @@ function initializeCreateClientListeners() {
     const useIdentifierCheckbox = document.getElementById('use-identifier');
     if (addressInput && useIdentifierCheckbox) {
         addressInput.addEventListener('click', () => {
-            if (!useIdentifierCheckbox.checked) { // Открываем модальное окно только если чекбокс не включен
+            if (!useIdentifierCheckbox.checked) {
                 const modal = document.getElementById('address-modal');
                 modal.style.display = 'flex';
                 setTimeout(() => modal.classList.add('active'), 10);
@@ -14,7 +14,6 @@ function initializeCreateClientListeners() {
                 if (addressForm) {
                     addressForm.addEventListener('submit', (e) => {
                         e.preventDefault();
-
                         const subject = document.getElementById('address-subject').value.trim();
                         const district = document.getElementById('address-district').value.trim();
                         const city = document.getElementById('address-city').value.trim();
@@ -72,12 +71,11 @@ function initializeCreateClientListeners() {
             }
         });
 
-        // Динамически обновляем placeholder в зависимости от состояния чекбокса
         useIdentifierCheckbox.addEventListener('change', () => {
             addressInput.placeholder = useIdentifierCheckbox.checked
                 ? "Введите кадастровый номер или идентификатор (например, 50:22:0010203:45)"
                 : "Нажмите для ввода адреса";
-            addressInput.readOnly = useIdentifierCheckbox.checked ? false : true; // Разрешаем ввод вручную только для идентификатора
+            addressInput.readOnly = useIdentifierCheckbox.checked ? false : true;
         });
     }
 
@@ -102,7 +100,8 @@ function initializeCreateClientListeners() {
             snils: document.getElementById('create-client-snils').value || null,
             connection_date: connectionDate ? new Date(connectionDate).toISOString().split('T')[0] : null,
             power_source: document.getElementById('create-client-power-source').value || null,
-            additional_info: document.getElementById('create-client-additional-info').value || null
+            additional_info: document.getElementById('create-client-additional-info').value || null,
+            department: document.getElementById('create-client-department').value
         };
 
         try {
@@ -135,7 +134,8 @@ function initializeCreateClientListeners() {
                         snils: 'До 12 символов (опционально)',
                         connection_date: 'Формат ГГГГ-ММ-ДД (опционально)',
                         power_source: 'До 100 символов (опционально)',
-                        additional_info: 'До 500 символов (опционально)'
+                        additional_info: 'До 500 символов (опционально)',
+                        department: 'Должен быть ЮЭС, ЦЭС или СЭС'
                     };
                     return `${field}: ${msg} (Требование: ${requirements[field] || 'Неизвестно'})`;
                 });

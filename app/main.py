@@ -1,7 +1,7 @@
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File
+from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File, Query
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
@@ -16,12 +16,9 @@ from . import crud, models, schemas
 from .database import engine, get_db
 from .security import create_access_token, verify_password, get_password_hash
 from .config import settings
-from fastapi import Query
-
 
 app = FastAPI(title="Система учета клиентов")
 
-# Настройка CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://clients.aores.ru"],
@@ -30,10 +27,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Подключение статических файлов
 app.mount("/static", StaticFiles(directory="frontend/templates"), name="static")
-
-# Создание таблиц в базе данных
 models.Base.metadata.create_all(bind=engine)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -96,12 +90,12 @@ async def forgot_password(request: dict, db: Session = Depends(get_db)):
 
     msg = MIMEText(f"Ваш код для сброса пароля: {reset_code}")
     msg['Subject'] = 'Сброс пароля'
-    msg['From'] = "your-email@gmail.com"  # Замените на ваш email
+    msg['From'] = "your-email@gmail.com"
     msg['To'] = email
 
     with smtplib.SMTP("smtp.gmail.com", 587) as server:
         server.starttls()
-        server.login("your-email@gmail.com", "your-app-password")  # Замените на ваш email и пароль приложения
+        server.login("your-email@gmail.com", "your-app-password")
         server.send_message(msg)
 
     return {"message": "Код отправлен на ваш email"}
@@ -134,15 +128,12 @@ def update_current_user(
 ):
     return crud.update_user(db, user, current_user)
 
-
 @app.post("/users/me/avatar", response_model=schemas.User)
 async def upload_avatar(
     avatar: UploadFile = File(...),
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    print(f"Received file: {avatar.filename}, size: {avatar.size}, content_type: {avatar.content_type}")
-
     if avatar.size > 20 * 1024 * 1024:
         raise HTTPException(status_code=400, detail="File size exceeds 20MB")
 
@@ -169,33 +160,20 @@ async def upload_avatar(
     current_user.avatar_url = avatar_url
     db.commit()
     db.refresh(current_user)
-
-    print(f"Avatar uploaded successfully: {avatar_url}")
     return current_user
-
 
 @app.delete("/users/me/avatar", response_model=schemas.User)
 async def delete_avatar(
-        db: Session = Depends(get_db),
-        current_user: models.User = Depends(get_current_user)
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
 ):
     if current_user.avatar_url:
-        # Исправляем путь, убирая "/static" из начала
         file_path = os.path.join("frontend/templates/img/avatars", os.path.basename(current_user.avatar_url))
-        print(f"Checking file existence at: {file_path}")  # Отладка
         if os.path.exists(file_path):
-            try:
-                os.remove(file_path)
-                print(f"File {file_path} deleted successfully")
-            except Exception as e:
-                print(f"Error deleting file {file_path}: {str(e)}")
-        else:
-            print(f"File {file_path} does not exist")
-
+            os.remove(file_path)
     current_user.avatar_url = None
     db.commit()
     db.refresh(current_user)
-    print(f"Avatar deleted for user {current_user.username}")
     return current_user
 
 @app.put("/users/me/password", response_model=schemas.User)
@@ -231,43 +209,31 @@ def create_client(
 ):
     return crud.create_client(db, client, current_user)
 
-
-
-
-@app.get("/clients/", response_model=None)  # Убираем response_model=List[schemas.Client], так как возвращаем кастомный JSON
+@app.get("/clients/", response_model=None)
 def read_clients(
     skip: int = Query(0, ge=0, description="Сколько записей пропустить"),
     limit: int = Query(10, ge=1, le=100, description="Максимальное количество записей"),
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    print(f"User {current_user.username} requested client list with skip={skip}, limit={limit}")
-    try:
-        clients = crud.get_clients(db, skip=skip, limit=limit)
-        total_clients = db.query(models.Client).count()
+    clients = crud.get_clients(db, current_user, skip=skip, limit=limit)
+    total_clients = db.query(models.Client).count() if current_user.is_admin else \
+        db.query(models.Client).filter(models.Client.department == current_user.department).count()
 
-        # Преобразуем объекты Client в словари с обработкой дат
-        clients_data = []
-        for client in clients:
-            client_dict = schemas.Client.from_orm(client).dict()
-            if client_dict["connection_date"]:
-                client_dict["connection_date"] = client_dict["connection_date"].isoformat()  # Преобразуем date в строку ISO
-            clients_data.append(client_dict)
+    clients_data = [schemas.Client.from_orm(client).dict() for client in clients]
+    for client_dict in clients_data:
+        if client_dict["connection_date"]:
+            client_dict["connection_date"] = client_dict["connection_date"].isoformat()
 
-        return JSONResponse(
-            status_code=200,
-            content={
-                "clients": clients_data,
-                "total": total_clients,
-                "skip": skip,
-                "limit": limit
-            }
-        )
-    except Exception as e:
-        return JSONResponse(
-            status_code=500,
-            content={"detail": f"Ошибка загрузки списка клиентов: {str(e)}"}
-        )
+    return JSONResponse(
+        status_code=200,
+        content={
+            "clients": clients_data,
+            "total": total_clients,
+            "skip": skip,
+            "limit": limit
+        }
+    )
 
 @app.get("/clients/{postal_address}", response_model=schemas.Client)
 def read_client(
@@ -275,10 +241,11 @@ def read_client(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    print(f"User {current_user.username} requested client {postal_address}")
     client = crud.get_client_by_address(db, postal_address)
-    if client is None:
+    if not client:
         raise HTTPException(status_code=404, detail="Client not found")
+    if not current_user.is_admin and client.department != current_user.department:
+        raise HTTPException(status_code=403, detail="Вы не можете просматривать клиентов из других отделов")
     return client
 
 @app.put("/clients/{postal_address}", response_model=schemas.Client)
@@ -288,26 +255,7 @@ def update_client(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    if not current_user.is_admin:
-        raise HTTPException(status_code=403, detail="Только администраторы могут редактировать данные клиентов")
-    db_client = crud.get_client_by_address(db, postal_address)
-    if not db_client:
-        raise HTTPException(status_code=404, detail="Client not found")
-
-    # Если postal_address изменён, обновляем его
-    new_postal_address = client.postal_address if 'postal_address' in client.dict(exclude_unset=True) else postal_address
-    if new_postal_address != postal_address:
-        existing_client = crud.get_client_by_address(db, new_postal_address)
-        if existing_client and existing_client.id != db_client.id:
-            raise HTTPException(status_code=400, detail="Клиент с таким адресом уже существует")
-        db_client.postal_address = new_postal_address
-
-    for var, value in client.dict(exclude_unset=True).items():
-        if var != 'postal_address':  # Исключаем postal_address из общего цикла, так как уже обработали
-            setattr(db_client, var, value)
-    db.commit()
-    db.refresh(db_client)
-    return db_client
+    return crud.update_client(db, postal_address, client, current_user)
 
 @app.get("/clients/search/", response_model=None)
 def search_clients(
@@ -320,37 +268,33 @@ def search_clients(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    print(f"User {current_user.username} searched for: {search}, connection_date: {connection_date}, power: {connected_power_min}-{connected_power_max}")
-    try:
-        clients = crud.search_clients(
-            db,
-            search_term=search,
-            connection_date=connection_date,
-            connected_power_min=connected_power_min,
-            connected_power_max=connected_power_max,
-            skip=skip,
-            limit=limit
-        )
-        total_clients = db.query(models.Client).count()  # Это общее количество без фильтров, можно улучшить
-        clients_data = [schemas.Client.from_orm(client).dict() for client in clients]
-        for client_dict in clients_data:
-            if client_dict["connection_date"]:
-                client_dict["connection_date"] = client_dict["connection_date"].isoformat()
-        return JSONResponse(
-            status_code=200,
-            content={
-                "clients": clients_data,
-                "total": total_clients,
-                "skip": skip,
-                "limit": limit
-            }
-        )
-    except Exception as e:
-        return JSONResponse(
-            status_code=500,
-            content={"detail": f"Ошибка поиска клиентов: {str(e)}"}
-        )
+    clients = crud.search_clients(
+        db,
+        current_user,
+        search_term=search,
+        connection_date=connection_date,
+        connected_power_min=connected_power_min,
+        connected_power_max=connected_power_max,
+        skip=skip,
+        limit=limit
+    )
+    total_clients = db.query(models.Client).count() if current_user.is_admin else \
+        db.query(models.Client).filter(models.Client.department == current_user.department).count()
 
+    clients_data = [schemas.Client.from_orm(client).dict() for client in clients]
+    for client_dict in clients_data:
+        if client_dict["connection_date"]:
+            client_dict["connection_date"] = client_dict["connection_date"].isoformat()
+
+    return JSONResponse(
+        status_code=200,
+        content={
+            "clients": clients_data,
+            "total": total_clients,
+            "skip": skip,
+            "limit": limit
+        }
+    )
 
 @app.delete("/clients/{postal_address}", status_code=204)
 def delete_client(
@@ -376,7 +320,6 @@ def read_users(
         raise HTTPException(status_code=403, detail="Только администраторы могут просматривать список пользователей")
     return db.query(models.User).all()
 
-
 @app.get("/users/{user_id}", response_model=schemas.User)
 def read_user(
     user_id: int,
@@ -390,13 +333,12 @@ def read_user(
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
-
 @app.put("/users/{user_id}", response_model=schemas.User)
 def update_user(
-        user_id: int,
-        user: schemas.UserUpdate,
-        db: Session = Depends(get_db),
-        current_user: models.User = Depends(get_current_user)
+    user_id: int,
+    user: schemas.UserUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
 ):
     if not current_user.is_admin:
         raise HTTPException(status_code=403, detail="Только администраторы могут редактировать пользователей")
@@ -408,7 +350,6 @@ def update_user(
     if not verify_password(user.current_password, current_user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect current password")
 
-    # Проверка прав на изменение статуса администратора
     if 'is_admin' in user.dict(exclude_unset=True):
         if db_user.is_admin and db_user.created_by_admin != current_user.id:
             raise HTTPException(
@@ -416,15 +357,14 @@ def update_user(
                 detail="Вы не можете изменить статус администратора, которого не назначали"
             )
         if user.is_admin and not db_user.is_admin:
-            db_user.created_by_admin = current_user.id  # Устанавливаем создателя при назначении админа
+            db_user.created_by_admin = current_user.id
         elif not user.is_admin and db_user.is_admin and db_user.created_by_admin == current_user.id:
-            db_user.created_by_admin = None  # Убираем создателя при снятии прав
+            db_user.created_by_admin = None
 
-    # Обновление остальных данных
     if db_user.email != user.email and crud.get_user_by_email(db, user.email):
         raise HTTPException(status_code=400, detail="Email already registered")
     if db_user.username != user.username and db.query(models.User).filter(
-            models.User.username == user.username).first():
+        models.User.username == user.username).first():
         raise HTTPException(status_code=400, detail="Username already taken")
 
     db_user.email = user.email
@@ -433,6 +373,8 @@ def update_user(
         db_user.hashed_password = get_password_hash(user.password)
     if 'is_admin' in user.dict(exclude_unset=True):
         db_user.is_admin = user.is_admin
+    if user.department:
+        db_user.department = user.department
 
     db.commit()
     db.refresh(db_user)
@@ -470,7 +412,8 @@ def create_first_admin():
             username="Armen",
             hashed_password=hashed_password,
             is_admin=True,
-            is_active=True
+            is_active=True,
+            department=models.DepartmentEnum.YES  # Указываем отдел для первого админа
         )
         db.add(admin)
         db.commit()
@@ -478,5 +421,4 @@ def create_first_admin():
         print("Первый администратор создан: ab@aores.ru / armen000")
     db.close()
 
-# Вызов при запуске (раскомментируйте, если нужно)
 # create_first_admin()

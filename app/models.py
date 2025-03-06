@@ -1,9 +1,15 @@
-from sqlalchemy import Column, Integer, String, Date, Float, Boolean, ForeignKey, func, DateTime
+from sqlalchemy import Column, Integer, String, Date, Float, Boolean, ForeignKey, func, DateTime, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 import datetime
+import enum
 
 Base = declarative_base()
+
+class DepartmentEnum(enum.Enum):
+    YES = "ЮЭС"
+    CES = "ЦЭС"
+    SES = "СЭС"
 
 class User(Base):
     __tablename__ = "users"
@@ -17,13 +23,14 @@ class User(Base):
     reset_code = Column(String, nullable=True)
     avatar_url = Column(String, nullable=True)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
-    created_by_admin = Column(Integer, ForeignKey("users.id"), nullable=True)  # Кто назначил администратором
+    created_by_admin = Column(Integer, ForeignKey("users.id"), nullable=True)
+    department = Column(Enum(DepartmentEnum), nullable=False)  # Добавляем отдел
 
     clients = relationship("Client", back_populates="creator")
-    creator = relationship("User", remote_side=[id])  # Связь с создателем
+    creator = relationship("User", remote_side=[id])
 
     def __repr__(self):
-        return f"<User(email='{self.email}', username='{self.username}', is_admin={self.is_admin})>"
+        return f"<User(email='{self.email}', username='{self.username}', is_admin={self.is_admin}, department={self.department})>"
 
 class Client(Base):
     __tablename__ = "clients"
@@ -42,8 +49,9 @@ class Client(Base):
     power_source = Column(String, nullable=True)
     additional_info = Column(String, nullable=True)
     created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+    department = Column(Enum(DepartmentEnum), nullable=False)  # Добавляем отдел
 
     creator = relationship("User", back_populates="clients")
 
     def __repr__(self):
-        return f"<Client(account_number='{self.account_number}', owner_name='{self.owner_name}')>"
+        return f"<Client(account_number='{self.account_number}', owner_name='{self.owner_name}', department={self.department})>"

@@ -14,7 +14,8 @@ function initializeCreateUserListeners() {
             const userData = {
                 email: document.getElementById('create-user-email').value,
                 username: document.getElementById('create-user-username').value,
-                password: document.getElementById('create-user-password').value
+                password: document.getElementById('create-user-password').value,
+                department: document.getElementById('create-user-department').value
             };
 
             try {
