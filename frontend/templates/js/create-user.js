@@ -115,10 +115,11 @@ async function editUser(userId) {
         const emailInput = document.getElementById('edit-user-email');
         const usernameInput = document.getElementById('edit-user-username');
         const passwordInput = document.getElementById('edit-user-password');
+        const departmentInput = document.getElementById('edit-user-department'); // Новое поле
         const isAdminCheckbox = document.getElementById('edit-user-is-admin');
         const currentPasswordInput = document.getElementById('edit-user-current-password');
 
-        if (!emailInput || !usernameInput || !passwordInput || !isAdminCheckbox || !currentPasswordInput) {
+        if (!emailInput || !usernameInput || !passwordInput || !departmentInput || !isAdminCheckbox || !currentPasswordInput) {
             console.error('One or more edit user form elements not found');
             showToast('Ошибка: элементы формы редактирования пользователя не найдены', 'error');
             return;
@@ -126,16 +127,16 @@ async function editUser(userId) {
 
         emailInput.value = user.email;
         usernameInput.value = user.username;
+        departmentInput.value = user.department; // Заполняем отдел
         isAdminCheckbox.checked = user.is_admin;
         passwordInput.value = '';
 
-        // Проверяем, может ли текущий пользователь менять статус
         const currentUserResponse = await axios.get(`${API_URL}/users/me`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const currentUser = currentUserResponse.data;
         if (!currentUser.is_admin || (user.is_admin && user.created_by_admin !== currentUser.id)) {
-            isAdminCheckbox.disabled = true; // Отключаем чекбокс, если нет прав
+            isAdminCheckbox.disabled = true;
         } else {
             isAdminCheckbox.disabled = false;
         }
@@ -159,6 +160,7 @@ async function editUser(userId) {
                     email: emailInput.value,
                     username: usernameInput.value,
                     password: passwordInput.value || null,
+                    department: departmentInput.value, // Добавляем отдел
                     is_admin: isAdminCheckbox.checked,
                     current_password: currentPasswordInput.value
                 };

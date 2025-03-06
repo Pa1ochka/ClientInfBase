@@ -234,30 +234,130 @@ async function editClient(postalAddress) {
         });
         const client = response.data;
 
-        // Заполняем все поля формы
-        document.getElementById('edit-client-postal-address').value = client.postal_address || '';
-        document.getElementById('edit-client-account-number').value = client.account_number || '';
-        document.getElementById('edit-client-owner-name').value = client.owner_name || '';
-        document.getElementById('edit-client-email').value = client.email || '';
-        document.getElementById('edit-client-phone-number').value = client.phone_number || '';
-        document.getElementById('edit-client-inn').value = client.inn || '';
-        document.getElementById('edit-client-connected-power').value = client.connected_power !== null ? client.connected_power : '';
-        document.getElementById('edit-client-passport-data').value = client.passport_data || '';
-        document.getElementById('edit-client-snils').value = client.snils || '';
-        document.getElementById('edit-client-connection-date').value = client.connection_date || '';
-        document.getElementById('edit-client-power-source').value = client.power_source || '';
-        document.getElementById('edit-client-additional-info').value = client.additional_info || '';
+        const editModal = document.getElementById('edit-modal');
+        if (!editModal) {
+            console.error('Edit modal not found');
+            showToast('Ошибка: модальное окно редактирования клиента не найдено', 'error');
+            return;
+        }
+        editModal.style.display = 'flex';
+        setTimeout(() => editModal.classList.add('active'), 10);
 
-        // Очистка предыдущего сообщения об ошибке
+        const fields = {
+            'edit-client-postal-address': client.postal_address || '',
+            'edit-client-account-number': client.account_number || '',
+            'edit-client-owner-name': client.owner_name || '',
+            'edit-client-department': client.department || '',
+            'edit-client-email': client.email || '',
+            'edit-client-phone-number': client.phone_number || '',
+            'edit-client-inn': client.inn || '',
+            'edit-client-connected-power': client.connected_power !== null ? client.connected_power : '',
+            'edit-client-passport-data': client.passport_data || '',
+            'edit-client-snils': client.snils || '',
+            'edit-client-connection-date': client.connection_date || '',
+            'edit-client-power-source': client.power_source || '',
+            'edit-client-additional-info': client.additional_info || ''
+        };
+
+        for (const [id, value] of Object.entries(fields)) {
+            const element = document.getElementById(id);
+            if (!element) {
+                console.error(`Element with ID ${id} not found`);
+                showToast(`Ошибка: элемент ${id} не найден`, 'error');
+                editModal.style.display = 'none';
+                return;
+            }
+            element.value = value;
+        }
+
         const message = document.getElementById('edit-client-message');
-        message.textContent = '';
-        message.classList.remove('error', 'success');
+        if (message) {
+            message.textContent = '';
+            message.classList.remove('error', 'success');
+        }
 
-        // Логика для модального окна адреса
+        const editForm = document.getElementById('edit-client-form');
+        if (!editForm) {
+            console.error('Edit form not found');
+            showToast('Ошибка: форма редактирования клиента не найдена', 'error');
+            editModal.style.display = 'none';
+            return;
+        }
+
+        editForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const updatedPostalAddress = document.getElementById('edit-client-postal-address').value;
+            const connectionDate = document.getElementById('edit-client-connection-date').value;
+            const clientData = {
+                postal_address: updatedPostalAddress,
+                account_number: document.getElementById('edit-client-account-number').value,
+                owner_name: document.getElementById('edit-client-owner-name').value,
+                department: document.getElementById('edit-client-department').value,
+                email: document.getElementById('edit-client-email').value,
+                phone_number: document.getElementById('edit-client-phone-number').value,
+                inn: document.getElementById('edit-client-inn').value,
+                connected_power: parseFloat(document.getElementById('edit-client-connected-power').value) || null,
+                passport_data: document.getElementById('edit-client-passport-data').value || null,
+                snils: document.getElementById('edit-client-snils').value || null,
+                connection_date: connectionDate ? new Date(connectionDate).toISOString().split('T')[0] : null,
+                power_source: document.getElementById('edit-client-power-source').value || null,
+                additional_info: document.getElementById('edit-client-additional-info').value || null
+            };
+
+            try {
+                const response = await axios.put(`${API_URL}/clients/${encodeURIComponent(postalAddress)}`, clientData, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (message) {
+                    message.textContent = 'Клиент обновлён!';
+                    message.classList.remove('error');
+                    message.classList.add('success');
+                }
+                editModal.classList.remove('active');
+                setTimeout(() => editModal.style.display = 'none', 300);
+                loadClients();
+                showToast('Клиент успешно обновлён', 'success');
+            } catch (error) {
+                const errorDetail = error.response?.data?.detail;
+                if (message) {
+                    if (Array.isArray(errorDetail)) {
+                        const errorMessages = errorDetail.map(err => {
+                            const field = err.loc[err.loc.length - 1];
+                            const msg = err.msg;
+                            const requirements = {
+                                account_number: 'От 1 до 50 символов',
+                                owner_name: 'От 1 до 100 символов',
+                                email: 'Корректный email (должен содержать @)',
+                                phone_number: 'От 5 до 20 символов',
+                                inn: 'От 10 до 12 символов',
+                                connected_power: 'Число (опционально)',
+                                passport_data: 'До 50 символов (опционально)',
+                                snils: 'До 12 символов (опционально)',
+                                connection_date: 'Формат ГГГГ-ММ-ДД (опционально)',
+                                power_source: 'До 100 символов (опционально)',
+                                additional_info: 'До 500 символов (опционально)',
+                                department: 'Должен быть ЮЭС, ЦЭС или СЭС'
+                            };
+                            return `${field}: ${msg} (Требование: ${requirements[field] || 'Неизвестно'})`;
+                        });
+                        message.textContent = errorMessages.join(', ');
+                    } else {
+                        message.textContent = errorDetail || 'Ошибка обновления клиента';
+                    }
+                    message.classList.add('error');
+                }
+            }
+        }, { once: true }); // Добавляем { once: true }, чтобы слушатель не накапливался
+
         const addressInput = document.getElementById('edit-client-postal-address');
         if (addressInput) {
             addressInput.addEventListener('click', () => {
                 const modal = document.getElementById('edit-address-modal');
+                if (!modal) {
+                    console.error('Edit address modal not found');
+                    return;
+                }
                 modal.style.display = 'flex';
                 setTimeout(() => modal.classList.add('active'), 10);
 
@@ -311,7 +411,7 @@ async function editClient(postalAddress) {
 
                         modal.classList.remove('active');
                         setTimeout(() => modal.style.display = 'none', 300);
-                    }, { once: true }); // Одноразовый слушатель
+                    }, { once: true });
                 }
 
                 const cancelBtn = document.getElementById('edit-address-cancel-btn');
@@ -321,17 +421,15 @@ async function editClient(postalAddress) {
                         setTimeout(() => modal.style.display = 'none', 300);
                     }, { once: true });
                 }
-            }, { once: true }); // Одноразовый слушатель для адреса
+            }, { once: true });
         }
-
-        // Отображение модального окна
-        const editModal = document.getElementById('edit-modal');
-        editModal.style.display = 'flex';
-        setTimeout(() => editModal.classList.add('active'), 10);
     } catch (error) {
         console.error('Ошибка получения данных клиента:', error.response?.data?.detail || error.message);
-        document.getElementById('edit-client-message').textContent = error.response?.data?.detail || 'Ошибка загрузки данных клиента';
-        document.getElementById('edit-client-message').classList.add('error');
+        const message = document.getElementById('edit-client-message');
+        if (message) {
+            message.textContent = error.response?.data?.detail || 'Ошибка загрузки данных клиента';
+            message.classList.add('error');
+        }
     }
 }
 

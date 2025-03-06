@@ -87,14 +87,12 @@ def get_client_by_address(db: Session, postal_address: str) -> Optional[models.C
     return db.query(models.Client).filter(models.Client.postal_address == postal_address).first()
 
 def update_client(db: Session, postal_address: str, client: schemas.ClientUpdate, current_user: models.User) -> Optional[models.Client]:
-    check_admin_privileges(current_user)  # Только админы могут обновлять
+    check_admin_privileges(current_user)
     db_client = get_client_by_address(db, postal_address)
     if not db_client:
         raise HTTPException(status_code=404, detail="Client not found")
 
-    if client.department and client.department != db_client.department:
-        raise HTTPException(status_code=403, detail="Изменение отдела клиента не поддерживается в этой версии")
-
+    # Убираем ограничение на изменение отдела
     for var, value in client.dict(exclude_unset=True).items():
         setattr(db_client, var, value)
     db.commit()

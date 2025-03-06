@@ -6,7 +6,7 @@
         </header>
         <form id="edit-client-form" class="form">
             <div class="input-group">
-                <input type="text" id="edit-client-postal-address" placeholder="Нажмите для ввода адреса" required> <!-- Убрано readonly -->
+                <input type="text" id="edit-client-postal-address" placeholder="Нажмите для ввода адреса" required>
                 <span class="material-icons">location_on</span>
                 <span class="tooltip">Нажмите, чтобы открыть форму адреса</span>
             </div>
@@ -19,6 +19,16 @@
                 <input type="text" id="edit-client-owner-name" placeholder="Имя владельца" required>
                 <span class="material-icons">person</span>
                 <span class="tooltip">От 1 до 100 символов</span>
+            </div>
+            <div class="input-group">
+                <select id="edit-client-department" required>
+                    <option value="" disabled>Выберите отдел</option>
+                    <option value="ЮЭС">ЮЭС</option>
+                    <option value="ЦЭС">ЦЭС</option>
+                    <option value="СЭС">СЭС</option>
+                </select>
+                <span class="material-icons">business</span>
+                <span class="tooltip">Отдел клиента</span>
             </div>
             <div class="input-group">
                 <input type="email" id="edit-client-email" placeholder="Email" required>

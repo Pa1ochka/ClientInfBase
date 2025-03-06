@@ -74,6 +74,16 @@
                 <input type="password" id="edit-user-password" placeholder="Новый пароль (опционально)">
                 <span class="material-icons">lock</span>
             </div>
+            <div class="input-group">
+                <select id="edit-user-department" required>
+                    <option value="" disabled>Выберите отдел</option>
+                    <option value="ЮЭС">ЮЭС</option>
+                    <option value="ЦЭС">ЦЭС</option>
+                    <option value="СЭС">СЭС</option>
+                </select>
+                <span class="material-icons">business</span>
+                <span class="tooltip">Отдел пользователя</span>
+            </div>
             <div class="input-group checkbox-group">
                 <label for="edit-user-is-admin">Администратор</label>
                 <input type="checkbox" id="edit-user-is-admin">
