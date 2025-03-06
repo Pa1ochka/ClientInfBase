@@ -135,43 +135,35 @@ def update_current_user(
 
 @app.post("/users/me/avatar", response_model=schemas.User)
 async def upload_avatar(
-        avatar: UploadFile = File(...),
-        db: Session = Depends(get_db),
-        current_user: models.User = Depends(get_current_user)
+    avatar: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
 ):
     print(f"Received file: {avatar.filename}, size: {avatar.size}, content_type: {avatar.content_type}")
 
-    # Проверка размера файла (макс. 20MB)
     if avatar.size > 20 * 1024 * 1024:
-        print(f"File size {avatar.size} exceeds 20MB limit")
         raise HTTPException(status_code=400, detail="File size exceeds 20MB")
 
-    # Проверка типа файла
     allowed_types = ["image/jpeg", "image/png", "image/gif"]
     if avatar.content_type not in allowed_types:
-        print(f"Invalid content type: {avatar.content_type}. Allowed: {allowed_types}")
-        raise HTTPException(status_code=400,
-                            detail=f"Only JPEG, PNG, or GIF files are allowed. Got: {avatar.content_type}")
+        raise HTTPException(status_code=400, detail=f"Only JPEG, PNG, or GIF files are allowed. Got: {avatar.content_type}")
 
-    # Путь для сохранения аватаров (исправлен на frontend/templates/img/avatars)
-    upload_dir = "frontend/templates/img/avatars"  # Изменено с static/img/avatars
+    upload_dir = "frontend/templates/img/avatars"
     os.makedirs(upload_dir, exist_ok=True)
 
-    # Генерируем уникальное имя файла
     file_extension = avatar.filename.split('.')[-1]
     file_name = f"{current_user.id}_{secrets.token_hex(8)}.{file_extension}"
     file_path = os.path.join(upload_dir, file_name)
 
-    # Удаляем старый аватар, если он существует
-    if current_user.avatar_url and os.path.exists(f"frontend/templates{current_user.avatar_url}"):
-        os.remove(f"frontend/templates{current_user.avatar_url}")
+    if current_user.avatar_url:
+        old_file_path = os.path.join(upload_dir, os.path.basename(current_user.avatar_url))
+        if os.path.exists(old_file_path):
+            os.remove(old_file_path)
 
-    # Сохраняем новый файл
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(avatar.file, buffer)
 
-    # Обновляем путь к аватару в базе данных
-    avatar_url = f"/static/img/avatars/{file_name}"  # Оставляем путь для фронтенда
+    avatar_url = f"/static/img/avatars/{file_name}"
     current_user.avatar_url = avatar_url
     db.commit()
     db.refresh(current_user)
@@ -182,11 +174,22 @@ async def upload_avatar(
 
 @app.delete("/users/me/avatar", response_model=schemas.User)
 async def delete_avatar(
-    db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user)
+        db: Session = Depends(get_db),
+        current_user: models.User = Depends(get_current_user)
 ):
-    if current_user.avatar_url and os.path.exists(f"frontend/templates{current_user.avatar_url}"):
-        os.remove(f"frontend/templates{current_user.avatar_url}")
+    if current_user.avatar_url:
+        # Исправляем путь, убирая "/static" из начала
+        file_path = os.path.join("frontend/templates/img/avatars", os.path.basename(current_user.avatar_url))
+        print(f"Checking file existence at: {file_path}")  # Отладка
+        if os.path.exists(file_path):
+            try:
+                os.remove(file_path)
+                print(f"File {file_path} deleted successfully")
+            except Exception as e:
+                print(f"Error deleting file {file_path}: {str(e)}")
+        else:
+            print(f"File {file_path} does not exist")
+
     current_user.avatar_url = None
     db.commit()
     db.refresh(current_user)
@@ -380,6 +383,29 @@ def update_user(
     db.commit()
     db.refresh(db_user)
     return db_user
+
+@app.delete("/users/{user_id}", status_code=204)
+def delete_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Только администраторы могут удалять пользователей")
+
+    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if db_user.is_admin and db_user.created_by_admin != current_user.id:
+        raise HTTPException(
+            status_code=403,
+            detail="Вы не можете удалить этого администратора, так как не являетесь его создателем"
+        )
+
+    db.delete(db_user)
+    db.commit()
+    return None
 
 def create_first_admin():
     db = next(get_db())

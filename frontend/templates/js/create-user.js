@@ -62,6 +62,7 @@ async function loadUsers() {
                 <td>${user.is_admin ? 'Администратор' : 'Сотрудник'}</td>
                 <td>
                     <button class="btn btn-edit" onclick="editUser(${user.id})"><span class="material-icons">edit</span></button>
+                    <button class="btn btn-danger" onclick="deleteUser(${user.id})"><span class="material-icons">delete</span></button>
                 </td>
             `;
             tableBody.appendChild(row);
@@ -70,6 +71,25 @@ async function loadUsers() {
         console.error('Ошибка загрузки пользователей:', error);
         document.getElementById('create-user-message').textContent = 'Ошибка загрузки списка пользователей';
         document.getElementById('create-user-message').classList.add('error');
+    }
+}
+
+async function deleteUser(userId) {
+    if (confirm('Вы уверены, что хотите удалить этого пользователя?')) {
+        try {
+            const url = `${API_URL}/users/${userId}`;
+            console.log('Sending DELETE request to:', url);
+            console.log('Token:', token);
+            const response = await axios.delete(url, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            console.log('Delete response:', response.status); // Отладка статуса ответа
+            showToast('Пользователь удалён', 'success');
+            loadUsers();
+        } catch (error) {
+            console.error('Ошибка удаления пользователя:', error.response?.data || error.message);
+            showToast(`Ошибка удаления: ${error.response?.data?.detail || error.message}`, 'error');
+        }
     }
 }
 

@@ -1,7 +1,7 @@
 <div id="profile-modal" class="modal">
     <div class="modal-content">
         <button id="profile-close-modal" class="close" aria-label="Закрыть">×</button>
-        <section id="profile-card" class="profile-card"> <!-- Добавлен id -->
+        <section id="profile-card" class="profile-card">
             <div class="profile-header">
                 <div class="avatar-container">
                     <img id="profile-avatar-img" src="/static/img/default-avatar.png" alt="Аватар" class="avatar">
@@ -49,7 +49,7 @@
             </div>
             <div class="input-group avatar-upload-group">
                 <input type="file" id="profile-avatar-upload" accept="image/*" style="display: none;">
-                </button>
+                <span id="avatar-upload-status" class="avatar-status"></span> <!-- Добавлен элемент -->
             </div>
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">Сохранить</button>

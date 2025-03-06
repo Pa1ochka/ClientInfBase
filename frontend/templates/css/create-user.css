@@ -55,30 +55,33 @@
     color: #7b8794;
 }
 
-#create-user-section .btn {
-    padding: 10px 20px; /* Уменьшено с 14px 24px */
-    font-size: 14px; /* Уменьшено с 16px */
+
+#create-user-section .btn-edit {
+    padding: 8px;
+    font-size: 14px;
     border: none;
-    border-radius: 8px; /* Уменьшено с 12px */
+    border-radius: 50%; /* Круглая форма */
     cursor: pointer;
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-    color: #fff;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    background: #3498db; /* Основной синий цвет */
+    color: #fff;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    font-weight: 600;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    max-width: 200px; /* Уменьшено с 300px */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-#create-user-section .btn:hover {
-    background: #2980b9;
-    transform: translateY(-2px); /* Уменьшено с -3px */
-    box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3); /* Уменьшено с 12px 28px */
+#create-user-section .btn-edit:hover {
+    background: #2980b9; /* Темнее при наведении */
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
 }
 
+#create-user-section .btn-edit .material-icons {
+    font-size: 18px; /* Размер иконки */
+}
 #create-user-message {
     margin-top: 20px;
     font-size: 14px;
@@ -309,4 +312,93 @@
     color: #2c3e50;
     background: #bdc3c7;
     transform: rotate(90deg);
+}
+
+#edit-user-modal .input-group.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+#edit-user-modal .input-group.checkbox-group label {
+    font-size: 15px;
+    color: #2c3e50;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+#edit-user-modal .input-group.checkbox-group input[type="checkbox"] {
+    appearance: none; /* Убираем стандартный вид */
+    width: 20px;
+    height: 20px;
+    border: 2px solid #3498db;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+#edit-user-modal .input-group.checkbox-group input[type="checkbox"]:checked {
+    background: #3498db;
+    border-color: #2980b9;
+}
+
+#edit-user-modal .input-group.checkbox-group input[type="checkbox"]:checked::after {
+    content: '\2713'; /* Символ галочки */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#edit-user-modal .input-group.checkbox-group input[type="checkbox"]:hover:not(:disabled) {
+    border-color: #2980b9;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+}
+
+#edit-user-modal .input-group.checkbox-group input[type="checkbox"]:disabled {
+    border-color: #bdc3c7;
+    background: #eef2f7;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+#create-user-section .btn-danger {
+    padding: 8px;
+    font-size: 14px;
+    border: none;
+    border-radius: 50%; /* Круглая форма */
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ff4757; /* Красный цвет */
+    color: #fff;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#create-user-section .btn-danger:hover {
+    background: #e74c3c; /* Темнее при наведении */
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+}
+
+#create-user-section .btn-danger .material-icons {
+    font-size: 18px; /* Размер иконки */
+}
+
+/* Выравнивание кнопок в строке */
+#create-user-section td:last-child {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
 }
