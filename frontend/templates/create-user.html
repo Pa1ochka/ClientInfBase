@@ -22,7 +22,6 @@
     </form>
     <div id="create-user-message" class="message"></div>
 
-    <!-- Таблица пользователей -->
     <div class="table-container">
         <table>
             <thead>
@@ -34,7 +33,14 @@
                 <th>Действия</th>
             </tr>
             </thead>
-            <tbody id="users-table-body"></tbody>
+            <tbody id="users-table-body">
+            <!-- Спиннер будет отображаться здесь -->
+            <tr id="users-loading" style="display: none;">
+                <td colspan="5" style="text-align: center;">
+                    <div class="loading-spinner"></div>
+                </td>
+            </tr>
+            </tbody>
         </table>
     </div>
 </section>

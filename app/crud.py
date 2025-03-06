@@ -1,3 +1,5 @@
+from datetime import date
+
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from typing import Optional, List
@@ -97,8 +99,16 @@ def update_client(db: Session, postal_address: str, client: schemas.ClientUpdate
     db.refresh(db_client)
     return db_client
 
-def search_clients(db: Session, search_term: Optional[str] = None, skip: int = 0, limit: int = 10) -> List[models.Client]:
-    """Поиск клиентов по заданному термину (доступно всем)."""
+
+def search_clients(
+        db: Session,
+        search_term: Optional[str] = None,
+        connection_date: Optional[date] = None,
+        connected_power_min: Optional[float] = None,
+        connected_power_max: Optional[float] = None,
+        skip: int = 0,
+        limit: int = 10
+) -> List[models.Client]:
     query = db.query(models.Client)
 
     if search_term:
@@ -124,6 +134,14 @@ def search_clients(db: Session, search_term: Optional[str] = None, skip: int = 0
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Error processing search term: {str(e)}"
             )
+
+    if connection_date:
+        query = query.filter(models.Client.connection_date == connection_date)
+
+    if connected_power_min is not None:
+        query = query.filter(models.Client.connected_power >= connected_power_min)
+    if connected_power_max is not None:
+        query = query.filter(models.Client.connected_power <= connected_power_max)
 
     try:
         return query.offset(skip).limit(limit).all()

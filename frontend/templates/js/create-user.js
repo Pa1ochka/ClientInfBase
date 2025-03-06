@@ -41,13 +41,16 @@ function initializeCreateUserListeners() {
 }
 
 async function loadUsers() {
+    const loadingRow = document.getElementById('users-loading');
+    const tableBody = document.getElementById('users-table-body');
+    loadingRow.style.display = 'table-row'; // Показываем спиннер
+    tableBody.innerHTML = ''; // Очищаем таблицу перед загрузкой
+
     try {
         const response = await axios.get(`${API_URL}/users/`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const users = response.data;
-        const tableBody = document.getElementById('users-table-body');
-        tableBody.innerHTML = '';
 
         const message = document.getElementById('create-user-message');
         message.textContent = '';
@@ -71,9 +74,10 @@ async function loadUsers() {
         console.error('Ошибка загрузки пользователей:', error);
         document.getElementById('create-user-message').textContent = 'Ошибка загрузки списка пользователей';
         document.getElementById('create-user-message').classList.add('error');
+    } finally {
+        loadingRow.style.display = 'none'; // Скрываем спиннер после завершения
     }
 }
-
 async function deleteUser(userId) {
     if (confirm('Вы уверены, что хотите удалить этого пользователя?')) {
         try {

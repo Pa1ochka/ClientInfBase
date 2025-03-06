@@ -25,7 +25,7 @@ class User(UserBase):
     class Config:
         from_attributes = True
 class ClientBase(BaseModel):
-    postal_address: str = Field(..., min_length=5, max_length=200, description="Уникальный адрес в формате 'Город, Улица, Дом'")
+    postal_address: str = Field(..., min_length=5, max_length=200, description="Уникальный адрес или идентификатор (например, 'Город, Улица, Дом' или '50:22:0010203:45')")
     account_number: str = Field(..., min_length=1, max_length=50)
     owner_name: str = Field(..., min_length=1, max_length=100)
     phone_number: str = Field(..., min_length=5, max_length=20)

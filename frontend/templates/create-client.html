@@ -10,9 +10,13 @@
             <fieldset class="form-section">
                 <legend class="form-section-title">Основная информация</legend>
                 <div class="input-group">
-                    <input type="text" id="create-client-postal-address" placeholder="Нажмите для ввода адреса" readonly required>
+                    <input type="text" id="create-client-postal-address" placeholder="Нажмите для ввода адреса или укажите идентификатор" required>
                     <span class="material-icons">location_on</span>
-                    <span class="tooltip">Нажмите, чтобы открыть форму адреса</span>
+                    <span class="tooltip">Введите адрес (от 5 до 200 символов) или включите чекбокс для кадастрового номера</span>
+                </div>
+                <div class="input-group checkbox-group">
+                    <label for="use-identifier">Использовать идентификатор вместо адреса</label>
+                    <input type="checkbox" id="use-identifier">
                 </div>
                 <div class="input-group">
                     <input type="text" id="create-client-account-number" placeholder="Номер счета" required>
@@ -25,6 +29,7 @@
                     <span class="tooltip">От 1 до 100 символов</span>
                 </div>
             </fieldset>
+
 
             <!-- Контактная информация -->
             <fieldset class="form-section">

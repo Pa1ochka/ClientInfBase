@@ -288,3 +288,50 @@
     background: #bdc3c7;
     transform: rotate(90deg);
 }
+
+#create-client-section .input-group.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+#create-client-section .input-group.checkbox-group label {
+    font-size: 15px;
+    color: #2c3e50;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+#create-client-section .input-group.checkbox-group input[type="checkbox"] {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #3498db;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+#create-client-section .input-group.checkbox-group input[type="checkbox"]:checked {
+    background: #3498db;
+    border-color: #2980b9;
+}
+
+#create-client-section .input-group.checkbox-group input[type="checkbox"]:checked::after {
+    content: '\2713'; /* Символ галочки */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#create-client-section .input-group.checkbox-group input[type="checkbox"]:hover:not(:checked) {
+    border-color: #2980b9;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+}

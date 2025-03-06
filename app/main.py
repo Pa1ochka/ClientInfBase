@@ -11,11 +11,13 @@ import smtplib
 from email.mime.text import MIMEText
 import shutil
 import os
-from datetime import timedelta
+from datetime import timedelta, date
 from . import crud, models, schemas
 from .database import engine, get_db
 from .security import create_access_token, verify_password, get_password_hash
 from .config import settings
+from fastapi import Query
+
 
 app = FastAPI(title="Система учета клиентов")
 
@@ -229,17 +231,38 @@ def create_client(
 ):
     return crud.create_client(db, client, current_user)
 
-@app.get("/clients/", response_model=List[schemas.Client])
+
+
+
+@app.get("/clients/", response_model=None)  # Убираем response_model=List[schemas.Client], так как возвращаем кастомный JSON
 def read_clients(
-    skip: int = 0,
-    limit: int = 100,
+    skip: int = Query(0, ge=0, description="Сколько записей пропустить"),
+    limit: int = Query(10, ge=1, le=100, description="Максимальное количество записей"),
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    print(f"User {current_user.username} requested client list")
+    print(f"User {current_user.username} requested client list with skip={skip}, limit={limit}")
     try:
-        clients = crud.get_clients(db, skip, limit)
-        return clients
+        clients = crud.get_clients(db, skip=skip, limit=limit)
+        total_clients = db.query(models.Client).count()
+
+        # Преобразуем объекты Client в словари с обработкой дат
+        clients_data = []
+        for client in clients:
+            client_dict = schemas.Client.from_orm(client).dict()
+            if client_dict["connection_date"]:
+                client_dict["connection_date"] = client_dict["connection_date"].isoformat()  # Преобразуем date в строку ISO
+            clients_data.append(client_dict)
+
+        return JSONResponse(
+            status_code=200,
+            content={
+                "clients": clients_data,
+                "total": total_clients,
+                "skip": skip,
+                "limit": limit
+            }
+        )
     except Exception as e:
         return JSONResponse(
             status_code=500,
@@ -286,16 +309,47 @@ def update_client(
     db.refresh(db_client)
     return db_client
 
-@app.get("/clients/search/", response_model=List[schemas.Client])
+@app.get("/clients/search/", response_model=None)
 def search_clients(
-    search: Optional[str] = None,
-    skip: int = 0,
-    limit: int = 10,
+    search: Optional[str] = Query(None, description="Поиск по любому полю"),
+    connection_date: Optional[date] = Query(None, description="Фильтр по дате подключения"),
+    connected_power_min: Optional[float] = Query(None, ge=0, description="Минимальная мощность"),
+    connected_power_max: Optional[float] = Query(None, ge=0, description="Максимальная мощность"),
+    skip: int = Query(0, ge=0, description="Сколько записей пропустить"),
+    limit: int = Query(10, ge=1, le=100, description="Максимальное количество записей"),
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    print(f"User {current_user.username} searched for: {search}")
-    return crud.search_clients(db, search, skip, limit)
+    print(f"User {current_user.username} searched for: {search}, connection_date: {connection_date}, power: {connected_power_min}-{connected_power_max}")
+    try:
+        clients = crud.search_clients(
+            db,
+            search_term=search,
+            connection_date=connection_date,
+            connected_power_min=connected_power_min,
+            connected_power_max=connected_power_max,
+            skip=skip,
+            limit=limit
+        )
+        total_clients = db.query(models.Client).count()  # Это общее количество без фильтров, можно улучшить
+        clients_data = [schemas.Client.from_orm(client).dict() for client in clients]
+        for client_dict in clients_data:
+            if client_dict["connection_date"]:
+                client_dict["connection_date"] = client_dict["connection_date"].isoformat()
+        return JSONResponse(
+            status_code=200,
+            content={
+                "clients": clients_data,
+                "total": total_clients,
+                "skip": skip,
+                "limit": limit
+            }
+        )
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"detail": f"Ошибка поиска клиентов: {str(e)}"}
+        )
 
 
 @app.delete("/clients/{postal_address}", status_code=204)

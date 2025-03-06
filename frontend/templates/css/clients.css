@@ -29,11 +29,33 @@
     display: flex;
     gap: 15px;
     margin-bottom: 25px;
+    flex-wrap: wrap; /* Чтобы поля переносились на маленьких экранах */
 }
 
 #clients-section .input-group {
     position: relative;
     flex-grow: 1;
+    min-width: 150px; /* Минимальная ширина для полей */
+}
+
+#clients-connection-date,
+#clients-power-min,
+#clients-power-max {
+    width: 100%;
+    padding: 14px 40px 14px 14px;
+    font-size: 15px;
+    border: 1px solid #eef2f7;
+    border-radius: 12px;
+    background: #fff;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+#clients-connection-date:focus,
+#clients-power-min:focus,
+#clients-power-max:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
 }
 
 #clients-search-term {

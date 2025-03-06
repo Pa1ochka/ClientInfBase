@@ -9,15 +9,27 @@
             <input type="text" id="clients-search-term" placeholder="Поиск по имени, адресу или ИНН...">
             <span class="material-icons">search</span>
         </div>
+        <div class="input-group">
+            <input type="date" id="clients-connection-date" placeholder="Дата подключения">
+            <span class="material-icons">calendar_today</span>
+        </div>
+        <div class="input-group">
+            <input type="number" id="clients-power-min" placeholder="Мощность от" step="0.1" min="0">
+            <span class="material-icons">power</span>
+        </div>
+        <div class="input-group">
+            <input type="number" id="clients-power-max" placeholder="Мощность до" step="0.1" min="0">
+            <span class="material-icons">power</span>
+        </div>
         <button id="clients-search-btn" class="btn btn-primary">
             <span class="material-icons">search</span> Искать
         </button>
     </div>
 
     <div class="table-container">
-        <div class="table-wrapper">
-            <table>
-                <thead>
+    <div class="table-wrapper">
+        <table>
+            <thead>
                 <tr>
                     <th>Адрес</th>
                     <th>Имя</th>
@@ -26,11 +38,17 @@
                     <th>ИНН</th>
                     <th>Действия</th>
                 </tr>
-                </thead>
-                <tbody id="clients-table-body"></tbody>
-            </table>
-        </div>
+            </thead>
+            <tbody id="clients-table-body">
+                <tr id="clients-loading" style="display: none;">
+                    <td colspan="6" style="text-align: center;">
+                        <div class="loading-spinner"></div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
+</div>
 
     <footer class="pagination-container">
         <button id="prev-page" class="btn btn-secondary">

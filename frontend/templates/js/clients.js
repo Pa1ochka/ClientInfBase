@@ -1,30 +1,28 @@
-function initializeClientsListeners() {
-    const clientsBtn = document.getElementById('clients-btn');
-    if (clientsBtn) {
-        clientsBtn.addEventListener('click', () => {
-            showSection('clients-section');
-            loadClients(); // Загружаем клиентов при переходе на страницу
+let currentPage = 1;
+const itemsPerPage = 10;
+
+
+
+
+
+    const nextPageBtn = document.getElementById('next-page');
+    if (nextPageBtn) {
+        nextPageBtn.addEventListener('click', () => {
+            const totalPages = parseInt(document.getElementById('total-pages').textContent);
+            if (currentPage < totalPages) {
+                currentPage++;
+                const searchTerm = document.getElementById('clients-search-term').value;
+                const connectionDate = document.getElementById('clients-connection-date').value || null;
+                const powerMin = document.getElementById('clients-power-min').value ? parseFloat(document.getElementById('clients-power-min').value) : null;
+                const powerMax = document.getElementById('clients-power-max').value ? parseFloat(document.getElementById('clients-power-max').value) : null;
+                loadClients(searchTerm, connectionDate, powerMin, powerMax);
+            }
         });
     }
 
-    const searchBtn = document.getElementById('clients-search-btn');
-    if (searchBtn) {
-        searchBtn.addEventListener('click', async () => {
-            const searchTerm = document.getElementById('clients-search-term').value;
-            await loadClients(searchTerm);
-        });
-    }
 
-    const closeModal = document.getElementById('edit-client-close-modal');
-    if (closeModal) {
-        closeModal.addEventListener('click', () => {
-            const editModal = document.getElementById('edit-modal');
-            editModal.classList.remove('active');
-            setTimeout(() => {
-                editModal.style.display = 'none';
-            }, 300);
-        });
-    }
+
+
 
     const editForm = document.getElementById('edit-client-form');
     if (editForm) {
@@ -86,49 +84,131 @@ function initializeClientsListeners() {
             }
         });
     }
-}
 
-async function loadClients(searchTerm = '') {
+
+async function loadClients(searchTerm = '', connectionDate = null, powerMin = null, powerMax = null) {
+    const loadingRow = document.getElementById('clients-loading');
+    const tableBody = document.getElementById('clients-table-body');
+
+    if (loadingRow) loadingRow.style.display = 'table-row'; // Показываем спиннер только если элемент есть
+    if (tableBody) tableBody.innerHTML = ''; // Очищаем таблицу только если она есть
+
     try {
-        const url = searchTerm ? `${API_URL}/clients/search/?search=${encodeURIComponent(searchTerm)}` : `${API_URL}/clients/`;
+        const skip = (currentPage - 1) * itemsPerPage;
+        let url = `${API_URL}/clients/search/?skip=${skip}&limit=${itemsPerPage}`;
+        if (searchTerm) url += `&search=${encodeURIComponent(searchTerm)}`;
+        if (connectionDate) url += `&connection_date=${connectionDate}`;
+        if (powerMin !== null) url += `&connected_power_min=${powerMin}`;
+        if (powerMax !== null) url += `&connected_power_max=${powerMax}`;
+
         const [clientsResponse, userResponse] = await Promise.all([
             axios.get(url, { headers: { 'Authorization': `Bearer ${token}` } }),
             axios.get(`${API_URL}/users/me`, { headers: { 'Authorization': `Bearer ${token}` } })
         ]);
-        const clients = clientsResponse.data;
+        const data = clientsResponse.data;
+        const clients = data.clients;
+        const totalClients = data.total;
         const isAdmin = userResponse.data.is_admin;
-        const tableBody = document.getElementById('clients-table-body');
-        tableBody.innerHTML = '';
 
         if (!Array.isArray(clients)) {
             document.getElementById('create-client-message').textContent = clients.detail || 'Ошибка загрузки списка клиентов';
             document.getElementById('create-client-message').classList.add('error');
+            if (loadingRow) loadingRow.style.display = 'none';
             return;
         }
 
-        clients.forEach(client => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-        <td>${client.postal_address}</td>
-        <td>${client.owner_name}</td>
-        <td>${client.email}</td>
-        <td>${client.phone_number}</td>
-        <td>${client.inn}</td>
-        <td>
-            ${isAdmin ? `<button class="btn btn-edit" onclick="editClient('${encodeURIComponent(client.postal_address)}')"><span class="material-icons">edit</span></button>` : ''}
-            ${isAdmin ? `<button class="btn btn-danger" onclick="deleteClient('${encodeURIComponent(client.postal_address)}')"><span class="material-icons">delete</span></button>` : ''}
-            <button class="btn btn-secondary" onclick="showClientDetails('${encodeURIComponent(client.postal_address)}')"><span class="material-icons">info</span></button>
-        </td>
-    `;
-    tableBody.appendChild(row);
-});
+        if (tableBody) {
+            clients.forEach((client, index) => {
+                const row = document.createElement('tr');
+                row.style.setProperty('--row-index', index);
+                row.innerHTML = `
+                    <td>${client.postal_address}</td>
+                    <td>${client.owner_name}</td>
+                    <td>${client.email}</td>
+                    <td>${client.phone_number}</td>
+                    <td>${client.inn}</td>
+                    <td>
+                        ${isAdmin ? `<button class="btn btn-edit" onclick="editClient('${encodeURIComponent(client.postal_address)}')"><span class="material-icons">edit</span></button>` : ''}
+                        ${isAdmin ? `<button class="btn btn-danger" onclick="deleteClient('${encodeURIComponent(client.postal_address)}')"><span class="material-icons">delete</span></button>` : ''}
+                        <button class="btn btn-secondary" onclick="showClientDetails('${encodeURIComponent(client.postal_address)}')"><span class="material-icons">info</span></button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        const totalPages = Math.ceil(totalClients / itemsPerPage);
+        document.getElementById('current-page').textContent = currentPage;
+        document.getElementById('total-pages').textContent = totalPages;
+        document.getElementById('prev-page').disabled = currentPage === 1;
+        document.getElementById('next-page').disabled = currentPage === totalPages;
+
     } catch (error) {
-        if (clients.detail) {
-            document.getElementById('create-client-message').textContent = clients.detail;
-            document.getElementById('create-client-message').classList.add('error');
-}       else {
-            document.getElementById('create-client-message').style.display = 'none';
+        console.error('Ошибка загрузки клиентов:', error.response?.data?.detail || error.message);
+        document.getElementById('create-client-message').textContent = error.response?.data?.detail || 'Ошибка загрузки списка клиентов';
+        document.getElementById('create-client-message').classList.add('error');
+    } finally {
+        if (loadingRow) loadingRow.style.display = 'none'; // Скрываем спиннер, если элемент есть
+    }
 }
+
+function initializeClientsListeners() {
+    const clientsBtn = document.getElementById('clients-btn');
+    if (clientsBtn) {
+        clientsBtn.addEventListener('click', () => {
+            showSection('clients-section');
+            loadClients(); // Загружаем без фильтров при клике на кнопку меню
+        });
+    }
+
+    const searchBtn = document.getElementById('clients-search-btn');
+    if (searchBtn) {
+        searchBtn.addEventListener('click', async () => {
+            currentPage = 1; // Сбрасываем страницу при новом поиске
+            const searchTerm = document.getElementById('clients-search-term')?.value || '';
+            const connectionDate = document.getElementById('clients-connection-date')?.value || null;
+            const powerMin = document.getElementById('clients-power-min')?.value ? parseFloat(document.getElementById('clients-power-min').value) : null;
+            const powerMax = document.getElementById('clients-power-max')?.value ? parseFloat(document.getElementById('clients-power-max').value) : null;
+            await loadClients(searchTerm, connectionDate, powerMin, powerMax);
+        });
+    }
+
+    const prevPageBtn = document.getElementById('prev-page');
+    if (prevPageBtn) {
+        prevPageBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                const searchTerm = document.getElementById('clients-search-term')?.value || '';
+                const connectionDate = document.getElementById('clients-connection-date')?.value || null;
+                const powerMin = document.getElementById('clients-power-min')?.value ? parseFloat(document.getElementById('clients-power-min').value) : null;
+                const powerMax = document.getElementById('clients-power-max')?.value ? parseFloat(document.getElementById('clients-power-max').value) : null;
+                loadClients(searchTerm, connectionDate, powerMin, powerMax);
+            }
+        });
+    }
+
+    const nextPageBtn = document.getElementById('next-page');
+    if (nextPageBtn) {
+        nextPageBtn.addEventListener('click', () => {
+            const totalPages = parseInt(document.getElementById('total-pages').textContent);
+            if (currentPage < totalPages) {
+                currentPage++;
+                const searchTerm = document.getElementById('clients-search-term')?.value || '';
+                const connectionDate = document.getElementById('clients-connection-date')?.value || null;
+                const powerMin = document.getElementById('clients-power-min')?.value ? parseFloat(document.getElementById('clients-power-min').value) : null;
+                const powerMax = document.getElementById('clients-power-max')?.value ? parseFloat(document.getElementById('clients-power-max').value) : null;
+                loadClients(searchTerm, connectionDate, powerMin, powerMax);
+            }
+        });
+    }
+
+    const closeModal = document.getElementById('edit-client-close-modal');
+    if (closeModal) {
+        closeModal.addEventListener('click', () => {
+            const editModal = document.getElementById('edit-modal');
+            editModal.classList.remove('active');
+            setTimeout(() => editModal.style.display = 'none', 300);
+        });
     }
 }
 
@@ -154,10 +234,26 @@ async function editClient(postalAddress) {
         });
         const client = response.data;
 
-        // Заполняем поля формы
-        document.getElementById('edit-client-postal-address').value = client.postal_address;
-        // ... (остальные поля остаются без изменений)
+        // Заполняем все поля формы
+        document.getElementById('edit-client-postal-address').value = client.postal_address || '';
+        document.getElementById('edit-client-account-number').value = client.account_number || '';
+        document.getElementById('edit-client-owner-name').value = client.owner_name || '';
+        document.getElementById('edit-client-email').value = client.email || '';
+        document.getElementById('edit-client-phone-number').value = client.phone_number || '';
+        document.getElementById('edit-client-inn').value = client.inn || '';
+        document.getElementById('edit-client-connected-power').value = client.connected_power !== null ? client.connected_power : '';
+        document.getElementById('edit-client-passport-data').value = client.passport_data || '';
+        document.getElementById('edit-client-snils').value = client.snils || '';
+        document.getElementById('edit-client-connection-date').value = client.connection_date || '';
+        document.getElementById('edit-client-power-source').value = client.power_source || '';
+        document.getElementById('edit-client-additional-info').value = client.additional_info || '';
 
+        // Очистка предыдущего сообщения об ошибке
+        const message = document.getElementById('edit-client-message');
+        message.textContent = '';
+        message.classList.remove('error', 'success');
+
+        // Логика для модального окна адреса
         const addressInput = document.getElementById('edit-client-postal-address');
         if (addressInput) {
             addressInput.addEventListener('click', () => {
@@ -215,7 +311,7 @@ async function editClient(postalAddress) {
 
                         modal.classList.remove('active');
                         setTimeout(() => modal.style.display = 'none', 300);
-                    });
+                    }, { once: true }); // Одноразовый слушатель
                 }
 
                 const cancelBtn = document.getElementById('edit-address-cancel-btn');
@@ -223,58 +319,19 @@ async function editClient(postalAddress) {
                     cancelBtn.addEventListener('click', () => {
                         modal.classList.remove('active');
                         setTimeout(() => modal.style.display = 'none', 300);
-                    });
+                    }, { once: true });
                 }
-            });
+            }, { once: true }); // Одноразовый слушатель для адреса
         }
 
+        // Отображение модального окна
         const editModal = document.getElementById('edit-modal');
         editModal.style.display = 'flex';
         setTimeout(() => editModal.classList.add('active'), 10);
     } catch (error) {
         console.error('Ошибка получения данных клиента:', error.response?.data?.detail || error.message);
-        document.getElementById('create-client-message').textContent = error.response?.data?.detail || 'Ошибка загрузки данных клиента';
-        document.getElementById('create-client-message').classList.add('error');
-    }
-}
-async function loadClients(searchTerm = '') {
-    try {
-        const url = searchTerm ? `${API_URL}/clients/search/?search=${encodeURIComponent(searchTerm)}` : `${API_URL}/clients/`;
-        const [clientsResponse, userResponse] = await Promise.all([
-            axios.get(url, { headers: { 'Authorization': `Bearer ${token}` } }),
-            axios.get(`${API_URL}/users/me`, { headers: { 'Authorization': `Bearer ${token}` } })
-        ]);
-        const clients = clientsResponse.data;
-        const isAdmin = userResponse.data.is_admin;
-        const tableBody = document.getElementById('clients-table-body');
-        tableBody.innerHTML = '';
-
-        if (!Array.isArray(clients)) {
-            document.getElementById('create-client-message').textContent = clients.detail || 'Ошибка загрузки списка клиентов';
-            document.getElementById('create-client-message').classList.add('error');
-            return;
-        }
-
-        clients.forEach(client => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${client.postal_address}</td>
-                <td>${client.owner_name}</td>
-                <td>${client.email}</td>
-                <td>${client.phone_number}</td>
-                <td>${client.inn}</td>
-                <td>
-                    ${isAdmin ? `<button class="btn btn-edit" onclick="editClient('${encodeURIComponent(client.postal_address)}')"><span class="material-icons">edit</span></button>` : ''}
-                    ${isAdmin ? `<button class="btn btn-danger" onclick="deleteClient('${encodeURIComponent(client.postal_address)}')"><span class="material-icons">delete</span></button>` : ''}
-                    <button class="btn btn-secondary" onclick="showClientDetails('${encodeURIComponent(client.postal_address)}')"><span class="material-icons">info</span></button>
-                </td>
-            `;
-            tableBody.appendChild(row);
-        });
-    } catch (error) {
-        console.error('Ошибка загрузки клиентов:', error.response?.data?.detail || error.message);
-        document.getElementById('create-client-message').textContent = error.response?.data?.detail || 'Ошибка загрузки списка клиентов';
-        document.getElementById('create-client-message').classList.add('error');
+        document.getElementById('edit-client-message').textContent = error.response?.data?.detail || 'Ошибка загрузки данных клиента';
+        document.getElementById('edit-client-message').classList.add('error');
     }
 }
 
