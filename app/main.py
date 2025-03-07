@@ -244,6 +244,7 @@ def update_client(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
+    print(f"Received postal_address: {postal_address}")  # Логирование
     return crud.update_client(db, postal_address, client, current_user)
 
 @app.get("/clients/search/", response_model=None)

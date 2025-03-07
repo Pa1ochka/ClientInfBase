@@ -284,72 +284,7 @@ async function editClient(postalAddress) {
             return;
         }
 
-        editForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const updatedPostalAddress = document.getElementById('edit-client-postal-address').value;
-            const connectionDate = document.getElementById('edit-client-connection-date').value;
-            const clientData = {
-                postal_address: updatedPostalAddress,
-                account_number: document.getElementById('edit-client-account-number').value,
-                owner_name: document.getElementById('edit-client-owner-name').value,
-                department: document.getElementById('edit-client-department').value,
-                email: document.getElementById('edit-client-email').value,
-                phone_number: document.getElementById('edit-client-phone-number').value,
-                inn: document.getElementById('edit-client-inn').value,
-                connected_power: parseFloat(document.getElementById('edit-client-connected-power').value) || null,
-                passport_data: document.getElementById('edit-client-passport-data').value || null,
-                snils: document.getElementById('edit-client-snils').value || null,
-                connection_date: connectionDate ? new Date(connectionDate).toISOString().split('T')[0] : null,
-                power_source: document.getElementById('edit-client-power-source').value || null,
-                additional_info: document.getElementById('edit-client-additional-info').value || null
-            };
-
-            try {
-                const response = await axios.put(`${API_URL}/clients/${encodeURIComponent(postalAddress)}`, clientData, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (message) {
-                    message.textContent = 'Клиент обновлён!';
-                    message.classList.remove('error');
-                    message.classList.add('success');
-                }
-                editModal.classList.remove('active');
-                setTimeout(() => editModal.style.display = 'none', 300);
-                loadClients();
-                showToast('Клиент успешно обновлён', 'success');
-            } catch (error) {
-                const errorDetail = error.response?.data?.detail;
-                if (message) {
-                    if (Array.isArray(errorDetail)) {
-                        const errorMessages = errorDetail.map(err => {
-                            const field = err.loc[err.loc.length - 1];
-                            const msg = err.msg;
-                            const requirements = {
-                                account_number: 'От 1 до 50 символов',
-                                owner_name: 'От 1 до 100 символов',
-                                email: 'Корректный email (должен содержать @)',
-                                phone_number: 'От 5 до 20 символов',
-                                inn: 'От 10 до 12 символов',
-                                connected_power: 'Число (опционально)',
-                                passport_data: 'До 50 символов (опционально)',
-                                snils: 'До 12 символов (опционально)',
-                                connection_date: 'Формат ГГГГ-ММ-ДД (опционально)',
-                                power_source: 'До 100 символов (опционально)',
-                                additional_info: 'До 500 символов (опционально)',
-                                department: 'Должен быть ЮЭС, ЦЭС или СЭС'
-                            };
-                            return `${field}: ${msg} (Требование: ${requirements[field] || 'Неизвестно'})`;
-                        });
-                        message.textContent = errorMessages.join(', ');
-                    } else {
-                        message.textContent = errorDetail || 'Ошибка обновления клиента';
-                    }
-                    message.classList.add('error');
-                }
-            }
-        }, { once: true }); // Добавляем { once: true }, чтобы слушатель не накапливался
-
+        // Обработчик клика для редактирования адреса (восстановлено из исходного кода)
         const addressInput = document.getElementById('edit-client-postal-address');
         if (addressInput) {
             addressInput.addEventListener('click', () => {
@@ -423,6 +358,87 @@ async function editClient(postalAddress) {
                 }
             }, { once: true });
         }
+
+        editForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const updatedPostalAddress = document.getElementById('edit-client-postal-address').value;
+            const connectionDate = document.getElementById('edit-client-connection-date').value;
+            const clientData = {
+                postal_address: updatedPostalAddress,  // Отправляем новый адрес
+                account_number: document.getElementById('edit-client-account-number').value,
+                owner_name: document.getElementById('edit-client-owner-name').value,
+                department: document.getElementById('edit-client-department').value,
+                email: document.getElementById('edit-client-email').value,
+                phone_number: document.getElementById('edit-client-phone-number').value,
+                inn: document.getElementById('edit-client-inn').value,
+                connected_power: parseFloat(document.getElementById('edit-client-connected-power').value) || null,
+                passport_data: document.getElementById('edit-client-passport-data').value || null,
+                snils: document.getElementById('edit-client-snils').value || null,
+                connection_date: connectionDate ? new Date(connectionDate).toISOString().split('T')[0] : null,
+                power_source: document.getElementById('edit-client-power-source').value || null,
+                additional_info: document.getElementById('edit-client-additional-info').value || null
+            };
+
+            console.log('Original postalAddress:', decodeURIComponent(postalAddress));
+            console.log('New postalAddress:', updatedPostalAddress);
+            console.log('Sending PUT to:', `${API_URL}/clients/${postalAddress}`);
+            console.log('Client data:', clientData);
+
+            try {
+                const response = await axios.put(`${API_URL}/clients/${postalAddress}`, clientData, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (message) {
+                    message.textContent = 'Клиент обновлён!';
+                    message.classList.remove('error');
+                    message.classList.add('success');
+                }
+                editModal.classList.remove('active');
+                setTimeout(() => editModal.style.display = 'none', 300);
+                loadClients();
+                showToast('Клиент успешно обновлён', 'success');
+            } catch (error) {
+                console.error('Ошибка обновления клиента:', error.response?.data || error);
+                if (message) {
+                    const errorDetail = error.response?.data?.detail;
+                    if (Array.isArray(errorDetail)) {
+                        const errorMessages = errorDetail.map(err => {
+                            const field = err.loc[err.loc.length - 1];
+                            const msg = err.msg;
+                            const requirements = {
+                                account_number: 'От 1 до 50 символов',
+                                owner_name: 'От 1 до 100 символов',
+                                email: 'Корректный email (должен содержать @)',
+                                phone_number: 'От 5 до 20 символов',
+                                inn: 'От 10 до 12 символов',
+                                connected_power: 'Число (опционально)',
+                                passport_data: 'До 50 символов (опционально)',
+                                snils: 'До 12 символов (опционально)',
+                                connection_date: 'Формат ГГГГ-ММ-ДД (опционально)',
+                                power_source: 'До 100 символов (опционально)',
+                                additional_info: 'До 500 символов (опционально)',
+                                department: 'Должен быть ЮЭС, ЦЭС или СЭС'
+                            };
+                            return `${field}: ${msg} (Требование: ${requirements[field] || 'Неизвестно'})`;
+                        });
+                        message.textContent = errorMessages.join(', ');
+                    } else {
+                        message.textContent = errorDetail || 'Ошибка обновления клиента';
+                    }
+                    message.classList.add('error');
+                }
+            }
+        }, { once: true });
+
+        const closeModal = document.getElementById('edit-client-close-modal');
+        if (closeModal) {
+            closeModal.addEventListener('click', () => {
+                editModal.classList.remove('active');
+                setTimeout(() => editModal.style.display = 'none', 300);
+            });
+        }
+
     } catch (error) {
         console.error('Ошибка получения данных клиента:', error.response?.data?.detail || error.message);
         const message = document.getElementById('edit-client-message');

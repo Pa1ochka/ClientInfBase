@@ -132,15 +132,26 @@ def get_clients(db: Session, current_user: models.User, skip: int = 0, limit: in
 def get_client_by_address(db: Session, postal_address: str) -> Optional[models.Client]:
     return db.query(models.Client).filter(models.Client.postal_address == postal_address).first()
 
-def update_client(db: Session, postal_address: str, client: schemas.ClientUpdate, current_user: models.User) -> Optional[models.Client]:
+
+def update_client(db: Session, postal_address: str, client: schemas.ClientUpdate, current_user: models.User) -> \
+Optional[models.Client]:
     check_admin_privileges(current_user)
     db_client = get_client_by_address(db, postal_address)
     if not db_client:
-        raise HTTPException(status_code=404, detail="Client not found")
+        raise HTTPException(status_code=404, detail=f"Client not found with postal_address: {postal_address}")
 
-    # Убираем ограничение на изменение отдела
-    for var, value in client.dict(exclude_unset=True).items():
+    # Если postal_address изменился, проверяем уникальность нового адреса
+    new_postal_address = client.postal_address
+    if new_postal_address and new_postal_address != postal_address:
+        existing_client = get_client_by_address(db, new_postal_address)
+        if existing_client:
+            raise HTTPException(status_code=400, detail="New postal address already exists")
+        db_client.postal_address = new_postal_address
+
+    # Обновляем остальные поля
+    for var, value in client.dict(exclude_unset=True, exclude={'postal_address'}).items():
         setattr(db_client, var, value)
+
     db.commit()
     db.refresh(db_client)
     return db_client
