@@ -22,6 +22,12 @@ def create_user(db: Session, user: schemas.UserCreate, current_user: models.User
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
+    # Если visible_client_fields не указаны, используем только обязательные поля
+    visible_fields = user.visible_client_fields or schemas.MANDATORY_CLIENT_FIELDS
+    # Проверяем, что все указанные поля валидны
+    if not all(field in schemas.ALL_CLIENT_FIELDS for field in visible_fields):
+        raise HTTPException(status_code=400, detail="Invalid client field specified")
+
     hashed_password = get_password_hash(user.password)
     db_user = models.User(
         email=user.email,
@@ -29,7 +35,8 @@ def create_user(db: Session, user: schemas.UserCreate, current_user: models.User
         hashed_password=hashed_password,
         is_admin=False,
         is_active=True,
-        department=user.department  # Указываем отдел
+        department=user.department,
+        visible_client_fields=visible_fields  # Сохраняем видимые поля
     )
     db.add(db_user)
     db.commit()
@@ -56,8 +63,12 @@ def update_user(db: Session, user: schemas.UserUpdate, current_user: models.User
     db_user.username = user.username
     if user.password:
         db_user.hashed_password = get_password_hash(user.password)
-    if user.department:  # Обновляем отдел, если указан
+    if user.department:
         db_user.department = user.department
+    if user.visible_client_fields is not None:  # Обновляем только если указано
+        if not all(field in schemas.ALL_CLIENT_FIELDS for field in user.visible_client_fields):
+            raise HTTPException(status_code=400, detail="Invalid client field specified")
+        db_user.visible_client_fields = user.visible_client_fields
 
     db.commit()
     db.refresh(db_user)
@@ -77,11 +88,31 @@ def create_client(db: Session, client: schemas.ClientCreate, current_user: model
     db.refresh(db_client)
     return db_client
 
-def get_clients(db: Session, current_user: models.User, skip: int = 0, limit: int = 100) -> List[models.Client]:
+def get_clients(db: Session, current_user: models.User, skip: int = 0, limit: int = 100) -> List[dict]:
     query = db.query(models.Client)
-    if not current_user.is_admin:  # Фильтр по отделу для сотрудников
+    if not current_user.is_admin:
         query = query.filter(models.Client.department == current_user.department)
-    return query.offset(skip).limit(limit).all()
+
+    clients = query.offset(skip).limit(limit).all()
+    total_clients = db.query(models.Client).count() if current_user.is_admin else \
+        db.query(models.Client).filter(models.Client.department == current_user.department).count()
+
+    # Фильтруем поля в зависимости от прав пользователя
+    visible_fields = current_user.visible_client_fields or schemas.MANDATORY_CLIENT_FIELDS if not current_user.is_admin else schemas.ALL_CLIENT_FIELDS
+    clients_data = []
+    for client in clients:
+        client_dict = schemas.Client.from_orm(client).dict()
+        filtered_client = {k: v for k, v in client_dict.items() if k in visible_fields or k in ["id", "created_by"]}
+        if filtered_client.get("connection_date"):
+            filtered_client["connection_date"] = filtered_client["connection_date"].isoformat()
+        clients_data.append(filtered_client)
+
+    return {
+        "clients": clients_data,
+        "total": total_clients,
+        "skip": skip,
+        "limit": limit
+    }
 
 def get_client_by_address(db: Session, postal_address: str) -> Optional[models.Client]:
     return db.query(models.Client).filter(models.Client.postal_address == postal_address).first()

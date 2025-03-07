@@ -1,26 +1,40 @@
 from pydantic import BaseModel, EmailStr, Field
-from typing import Optional
+from typing import Optional, List
 from datetime import date, datetime
 from enum import Enum
 
 class DepartmentEnum(str, Enum):
-    YES = "ЮЭС"
-    CES = "ЦЭС"
-    SES = "СЭС"
+    YES = "YES"
+    CES = "CES"
+    SES = "SES"
+
+MANDATORY_CLIENT_FIELDS = ["postal_address", "account_number", "owner_name", "department"]
+
+# Все возможные поля клиента
+ALL_CLIENT_FIELDS = [
+    "postal_address", "account_number", "owner_name", "phone_number", "email",
+    "connected_power", "passport_data", "inn", "snils", "connection_date",
+    "power_source", "additional_info", "department"
+]
 
 class UserBase(BaseModel):
     email: EmailStr
     username: str = Field(..., min_length=3, max_length=50)
-    department: DepartmentEnum  # Добавляем отдел
+    department: DepartmentEnum
 
 class UserCreate(UserBase):
     password: str = Field(..., min_length=8)
+    visible_client_fields: Optional[List[str]] = None  # Список видимых полей клиента
+
+    class Config:
+        json_encoders = {datetime: lambda v: v.isoformat()}
 
 class UserUpdate(UserBase):
     current_password: str = Field(..., min_length=8)
     password: Optional[str] = Field(None, min_length=8)
     is_admin: Optional[bool] = None
-    department: Optional[DepartmentEnum] = None  # Опционально при обновлении
+    department: Optional[DepartmentEnum] = None
+    visible_client_fields: Optional[List[str]] = None  # Список видимых полей клиента
 
 class User(UserBase):
     id: int
@@ -29,6 +43,7 @@ class User(UserBase):
     avatar_url: Optional[str] = None
     created_at: Optional[datetime] = None
     created_by_admin: Optional[int] = None
+    visible_client_fields: Optional[List[str]] = None
 
     class Config:
         from_attributes = True

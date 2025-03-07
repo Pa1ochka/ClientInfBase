@@ -449,6 +449,16 @@ async function showClientDetails(encodedPostalAddress) {
             return;
         }
 
+        // Словарь для преобразования department в полное название
+        const departmentNames = {
+            'YES': 'Южные электрические сети',
+            'CES': 'Центральные электрические сети',
+            'SES': 'Северные электрические сети'
+        };
+
+        // Получаем полное название отдела или '-' если department отсутствует/невалиден
+        const departmentFullName = departmentNames[client.department] || '-';
+
         const modal = document.createElement('div');
         modal.className = 'client-details-modal';
         modal.innerHTML = `
@@ -458,6 +468,7 @@ async function showClientDetails(encodedPostalAddress) {
                     <h2><span class="material-icons">person</span> ${client.owner_name || 'Без имени'}</h2>
                 </header>
                 <div class="client-details">
+                    <p><strong>Регион:</strong> ${departmentFullName}</p>
                     <p><strong>Адрес:</strong> ${client.postal_address || '-'}</p>
                     <p><strong>Номер счета:</strong> ${client.account_number || '-'}</p>
                     <p><strong>Email:</strong> ${client.email || '-'}</p>

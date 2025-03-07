@@ -216,24 +216,8 @@ def read_clients(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    clients = crud.get_clients(db, current_user, skip=skip, limit=limit)
-    total_clients = db.query(models.Client).count() if current_user.is_admin else \
-        db.query(models.Client).filter(models.Client.department == current_user.department).count()
-
-    clients_data = [schemas.Client.from_orm(client).dict() for client in clients]
-    for client_dict in clients_data:
-        if client_dict["connection_date"]:
-            client_dict["connection_date"] = client_dict["connection_date"].isoformat()
-
-    return JSONResponse(
-        status_code=200,
-        content={
-            "clients": clients_data,
-            "total": total_clients,
-            "skip": skip,
-            "limit": limit
-        }
-    )
+    result = crud.get_clients(db, current_user, skip=skip, limit=limit)
+    return JSONResponse(status_code=200, content=result)
 
 @app.get("/clients/{postal_address}", response_model=schemas.Client)
 def read_client(
@@ -246,7 +230,12 @@ def read_client(
         raise HTTPException(status_code=404, detail="Client not found")
     if not current_user.is_admin and client.department != current_user.department:
         raise HTTPException(status_code=403, detail="Вы не можете просматривать клиентов из других отделов")
-    return client
+
+    # Фильтруем поля
+    visible_fields = current_user.visible_client_fields or schemas.MANDATORY_CLIENT_FIELDS if not current_user.is_admin else schemas.ALL_CLIENT_FIELDS
+    client_dict = schemas.Client.from_orm(client).dict()
+    filtered_client = {k: v for k, v in client_dict.items() if k in visible_fields or k in ["id", "created_by"]}
+    return filtered_client
 
 @app.put("/clients/{postal_address}", response_model=schemas.Client)
 def update_client(
@@ -421,4 +410,4 @@ def create_first_admin():
         print("Первый администратор создан: ab@aores.ru / armen000")
     db.close()
 
-# create_first_admin()
+create_first_admin()

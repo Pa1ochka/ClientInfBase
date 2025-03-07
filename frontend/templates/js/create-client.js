@@ -79,35 +79,37 @@ function initializeCreateClientListeners() {
         });
     }
 
-    document.getElementById('create-client-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
+document.getElementById('create-client-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-        if (!validateClientForm()) {
-            return;
-        }
+    if (!validateClientForm()) {
+        return;
+    }
 
-        const connectionDate = document.getElementById('create-client-connection-date').value;
-        const postalAddress = document.getElementById('create-client-postal-address').value;
-        const clientData = {
-            postal_address: postalAddress,
-            account_number: document.getElementById('create-client-account-number').value,
-            owner_name: document.getElementById('create-client-owner-name').value,
-            email: document.getElementById('create-client-email').value,
-            phone_number: document.getElementById('create-client-phone-number').value,
-            inn: document.getElementById('create-client-inn').value,
-            connected_power: parseFloat(document.getElementById('create-client-connected-power').value) || null,
-            passport_data: document.getElementById('create-client-passport-data').value || null,
-            snils: document.getElementById('create-client-snils').value || null,
-            connection_date: connectionDate ? new Date(connectionDate).toISOString().split('T')[0] : null,
-            power_source: document.getElementById('create-client-power-source').value || null,
-            additional_info: document.getElementById('create-client-additional-info').value || null,
-            department: document.getElementById('create-client-department').value
-        };
+    const connectionDate = document.getElementById('create-client-connection-date').value;
+    const postalAddress = document.getElementById('create-client-postal-address').value;
+    const clientData = {
+        postal_address: postalAddress,
+        account_number: document.getElementById('create-client-account-number').value,
+        owner_name: document.getElementById('create-client-owner-name').value,
+        email: document.getElementById('create-client-email').value,
+        phone_number: document.getElementById('create-client-phone-number').value,
+        inn: document.getElementById('create-client-inn').value,
+        connected_power: parseFloat(document.getElementById('create-client-connected-power').value) || null,
+        passport_data: document.getElementById('create-client-passport-data').value || null,
+        snils: document.getElementById('create-client-snils').value || null,
+        connection_date: connectionDate ? new Date(connectionDate).toISOString().split('T')[0] : null,
+        power_source: document.getElementById('create-client-power-source').value || null,
+        additional_info: document.getElementById('create-client-additional-info').value || null,
+        department: document.getElementById('create-client-department').value
+    };
 
-        try {
-            const response = await axios.post(`${API_URL}/clients/`, clientData, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+    console.log('Отправляемые данные:', clientData); // Логирование для проверки
+
+    try {
+        const response = await axios.post(`${API_URL}/clients/`, clientData, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
             const message = document.getElementById('create-client-message');
             message.textContent = 'Клиент создан!';
             message.classList.remove('error');

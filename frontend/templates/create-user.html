@@ -1,60 +1,101 @@
 <section id="create-user-section" class="card">
-    <header>
-        <h2><span class="material-icons">person_add</span> Управление пользователями</h2>
+    <header class="card-header">
+        <h2><span class="material-icons">people</span> Управление пользователями</h2>
+        <button id="create-user-modal-btn" class="btn btn-primary">
+            <span class="material-icons">person_add</span> Создать пользователя
+        </button>
     </header>
-    <form id="create-user-form" class="form">
-        <div class="input-group">
-            <input type="email" id="create-user-email" placeholder="Email" required>
-            <span class="material-icons">email</span>
-            <span class="tooltip">Корректный email</span>
-        </div>
-        <div class="input-group">
-            <input type="text" id="create-user-username" placeholder="Имя пользователя" required>
-            <span class="material-icons">person</span>
-            <span class="tooltip">От 3 до 50 символов</span>
-        </div>
-        <div class="input-group">
-            <input type="password" id="create-user-password" placeholder="Пароль" required>
-            <span class="material-icons">lock</span>
-            <span class="tooltip">Минимум 8 символов</span>
-        </div>
-        <div class="input-group">
-            <select id="create-user-department" required>
-                <option value="" disabled selected>Выберите отдел</option>
-                <option value="ЮЭС">ЮЭС</option>
-                <option value="ЦЭС">ЦЭС</option>
-                <option value="СЭС">СЭС</option>
-            </select>
-            <span class="material-icons">business</span>
-            <span class="tooltip">Отдел пользователя</span>
-        </div>
-        <button type="submit" class="btn btn-primary">Создать пользователя</button>
-    </form>
-    <div id="create-user-message" class="message"></div>
 
+    <!-- Таблица пользователей -->
     <div class="table-container">
         <table>
             <thead>
-            <tr>
-                <th>ID</th>
-                <th>Email</th>
-                <th>Имя пользователя</th>
-                <th>Права</th>
-                <th>Действия</th>
-            </tr>
+                <tr>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Имя пользователя</th>
+                    <th>Права</th>
+                    <th>Действия</th>
+                </tr>
             </thead>
             <tbody id="users-table-body">
-            <!-- Спиннер будет отображаться здесь -->
-            <tr id="users-loading" style="display: none;">
-                <td colspan="5" style="text-align: center;">
-                    <div class="loading-spinner"></div>
-                </td>
-            </tr>
+                <tr id="users-loading" style="display: none;">
+                    <td colspan="5" class="spinner-cell">
+                        <div class="loading-spinner"></div>
+                    </td>
+                </tr>
+                <!-- Данные пользователей будут добавляться через JS -->
             </tbody>
         </table>
     </div>
 </section>
 
+<!-- Модальное окно создания пользователя -->
+<div id="create-user-modal" class="modal">
+    <div class="modal-content">
+        <button id="create-user-close-modal" class="close" aria-label="Закрыть">×</button>
+        <header>
+            <h2><span class="material-icons">person_add</span> Создать нового пользователя</h2>
+        </header>
+        <form id="create-user-form" class="form">
+            <div class="input-group">
+                <label for="create-user-email">Email</label>
+                <div class="input-wrapper">
+                    <input type="email" id="create-user-email" placeholder="Email" required>
+                    <span class="material-icons">email</span>
+                    <span class="tooltip">Корректный email</span>
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="create-user-username">Имя пользователя</label>
+                <div class="input-wrapper">
+                    <input type="text" id="create-user-username" placeholder="Имя пользователя" required>
+                    <span class="material-icons">person</span>
+                    <span class="tooltip">От 3 до 50 символов</span>
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="create-user-password">Пароль</label>
+                <div class="input-wrapper">
+                    <input type="password" id="create-user-password" placeholder="Пароль" required>
+                    <span class="material-icons">lock</span>
+                    <span class="tooltip">Минимум 8 символов</span>
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="create-user-department">Отдел</label>
+                <div class="input-wrapper">
+                    <select id="create-user-department" required>
+                        <option value="" disabled selected>Выберите отдел</option>
+                        <option value="YES">ЮЭС</option>
+                        <option value="CES">ЦЭС</option>
+                        <option value="SES">СЭС</option>
+                    </select>
+                    <span class="material-icons">business</span>
+                    <span class="tooltip">Отдел пользователя</span>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Видимые поля клиента</label>
+                <div id="create-client-fields" class="checkbox-group">
+                    <label><input type="checkbox" value="phone_number"> Телефон</label>
+                    <label><input type="checkbox" value="email"> Email</label>
+                    <label><input type="checkbox" value="connected_power"> Подключенная мощность</label>
+                    <label><input type="checkbox" value="passport_data"> Паспортные данные</label>
+                    <label><input type="checkbox" value="inn"> ИНН</label>
+                    <label><input type="checkbox" value="snils"> СНИЛС</label>
+                    <label><input type="checkbox" value="connection_date"> Дата подключения</label>
+                    <label><input type="checkbox" value="power_source"> Источник питания</label>
+                    <label><input type="checkbox" value="additional_info"> Доп. информация</label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Создать</button>
+        </form>
+        <div id="create-user-message" class="message"></div>
+    </div>
+</div>
+
+<!-- Модальное окно редактирования остается без изменений -->
 <div id="edit-user-modal" class="modal">
     <div class="modal-content">
         <button id="edit-user-close-modal" class="close" aria-label="Закрыть">×</button>
@@ -77,16 +118,26 @@
             <div class="input-group">
                 <select id="edit-user-department" required>
                     <option value="" disabled>Выберите отдел</option>
-                    <option value="ЮЭС">ЮЭС</option>
-                    <option value="ЦЭС">ЦЭС</option>
-                    <option value="СЭС">СЭС</option>
+                    <option value="YES">ЮЭС</option>
+                    <option value="CES">ЦЭС</option>
+                    <option value="SES">СЭС</option>
                 </select>
                 <span class="material-icons">business</span>
-                <span class="tooltip">Отдел пользователя</span>
             </div>
-            <div class="input-group checkbox-group">
-                <label for="edit-user-is-admin">Администратор</label>
-                <input type="checkbox" id="edit-user-is-admin">
+            <div class="input-group">
+                <label>Роли и видимые поля клиента:</label>
+                <div id="edit-user-permissions" class="checkbox-group">
+                    <label><input type="checkbox" id="edit-user-is-admin" value="is_admin"> Администратор</label>
+                    <label><input type="checkbox" value="phone_number"> Телефон</label>
+                    <label><input type="checkbox" value="email"> Email</label>
+                    <label><input type="checkbox" value="connected_power"> Подключенная мощность</label>
+                    <label><input type="checkbox" value="passport_data"> Паспортные данные</label>
+                    <label><input type="checkbox" value="inn"> ИНН</label>
+                    <label><input type="checkbox" value="snils"> СНИЛС</label>
+                    <label><input type="checkbox" value="connection_date"> Дата подключения</label>
+                    <label><input type="checkbox" value="power_source"> Источник питания</label>
+                    <label><input type="checkbox" value="additional_info"> Доп. информация</label>
+                </div>
             </div>
             <div class="input-group">
                 <input type="password" id="edit-user-current-password" placeholder="Ваш текущий пароль" required>

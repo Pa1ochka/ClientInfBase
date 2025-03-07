@@ -1,15 +1,14 @@
-from sqlalchemy import Column, Integer, String, Date, Float, Boolean, ForeignKey, func, DateTime, Enum
+from sqlalchemy import Column, Integer, String, Date, Float, Boolean, ForeignKey, func, DateTime, Enum, JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
-import datetime
 import enum
 
 Base = declarative_base()
 
 class DepartmentEnum(enum.Enum):
-    YES = "ЮЭС"
-    CES = "ЦЭС"
-    SES = "СЭС"
+    YES = "YES"
+    CES = "CES"
+    SES = "SES"
 
 class User(Base):
     __tablename__ = "users"
@@ -22,9 +21,10 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     reset_code = Column(String, nullable=True)
     avatar_url = Column(String, nullable=True)
-    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     created_by_admin = Column(Integer, ForeignKey("users.id"), nullable=True)
     department = Column(Enum(DepartmentEnum), nullable=False)  # Добавляем отдел
+    visible_client_fields = Column(JSON, nullable=True)
 
     clients = relationship("Client", back_populates="creator")
     creator = relationship("User", remote_side=[id])

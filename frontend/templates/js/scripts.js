@@ -25,7 +25,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         { fileName: 'profile', container: '#modal-container', sectionId: 'profile-modal' },
         { fileName: 'create-client', container: '#modal-container', sectionId: 'address-modal' },
         { fileName: 'edit-client', container: '#modal-container', sectionId: 'edit-address-modal' },
-        { fileName: 'create-user', container: '#modal-container', sectionId: 'edit-user-modal' } // Добавлено
+        { fileName: 'create-user', container: '#modal-container', sectionId: 'create-user-modal' }, // Модальное окно создания
+        { fileName: 'create-user', container: '#modal-container', sectionId: 'edit-user-modal' }  // Модальное окно редактирования
     ];
 
     await Promise.all(sectionsToLoad.map(section =>
