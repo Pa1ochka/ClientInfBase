@@ -1,7 +1,8 @@
 from datetime import date
-from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from typing import Optional, List
+from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
 from . import models, schemas
 from .security import get_password_hash, verify_password
@@ -16,11 +17,21 @@ def check_admin_privileges(current_user: models.User) -> None:
 def get_user_by_email(db: Session, email: str) -> Optional[models.User]:
     return db.query(models.User).filter(models.User.email == email).first()
 
+def get_user_by_username(db: Session, username: str) -> Optional[models.User]:
+    return db.query(models.User).filter(models.User.username == username).first()
+
 def create_user(db: Session, user: schemas.UserCreate, current_user: models.User) -> models.User:
     check_admin_privileges(current_user)
-    existing_user = get_user_by_email(db, user.email)
-    if existing_user:
+
+    # Проверяем уникальность email
+    existing_user_email = get_user_by_email(db, user.email)
+    if existing_user_email:
         raise HTTPException(status_code=400, detail="Email already registered")
+
+    # Проверяем уникальность username
+    existing_user_username = get_user_by_username(db, user.username)
+    if existing_user_username:
+        raise HTTPException(status_code=400, detail="Username already taken")
 
     # Если visible_client_fields не указаны, используем только обязательные поля
     visible_fields = user.visible_client_fields or schemas.MANDATORY_CLIENT_FIELDS
@@ -39,8 +50,12 @@ def create_user(db: Session, user: schemas.UserCreate, current_user: models.User
         visible_client_fields=visible_fields  # Сохраняем видимые поля
     )
     db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
+    try:
+        db.commit()
+        db.refresh(db_user)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Ошибка: email или username уже заняты")
     return db_user
 
 def update_user(db: Session, user: schemas.UserUpdate, current_user: models.User) -> models.User:

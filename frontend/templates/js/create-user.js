@@ -1,5 +1,4 @@
 function initializeCreateUserListeners() {
-    // Привязываем обработчик к кнопке "Управление пользователями" в сайдбаре
     const createUserBtn = document.getElementById('create-user-btn');
     if (createUserBtn) {
         createUserBtn.addEventListener('click', () => {
@@ -16,37 +15,25 @@ function initializeCreateUserListeners() {
         console.error('Кнопка #create-user-btn не найдена в DOM');
     }
 
-    // Проверяем наличие модального окна и кнопки открытия
     const createUserModalBtn = document.getElementById('create-user-modal-btn');
     const createUserModal = document.getElementById('create-user-modal');
     const createUserCloseModal = document.getElementById('create-user-close-modal');
 
-    if (!createUserModalBtn) {
-        console.error('Кнопка #create-user-modal-btn не найдена в DOM');
-        return;
-    }
-    if (!createUserModal) {
-        console.error('Модальное окно #create-user-modal не найдено в DOM');
-        return;
-    }
-    if (!createUserCloseModal) {
-        console.error('Кнопка закрытия #create-user-close-modal не найдена в DOM');
+    if (!createUserModalBtn || !createUserModal || !createUserCloseModal) {
+        console.error('Не найдены элементы модального окна создания пользователя');
         return;
     }
 
-    // Открытие модального окна
     createUserModalBtn.addEventListener('click', () => {
         createUserModal.style.display = 'flex';
         setTimeout(() => createUserModal.classList.add('active'), 10);
     });
 
-    // Закрытие модального окна
     createUserCloseModal.addEventListener('click', () => {
         createUserModal.classList.remove('active');
         setTimeout(() => createUserModal.style.display = 'none', 300);
     });
 
-    // Обработчик формы создания пользователя
     const createUserForm = document.getElementById('create-user-form');
     if (createUserForm) {
         createUserForm.addEventListener('submit', async (e) => {
@@ -62,24 +49,26 @@ function initializeCreateUserListeners() {
                 visible_client_fields: visibleFields
             };
 
+            const messageElement = document.getElementById('create-user-message');
+            messageElement.textContent = '';
+            messageElement.classList.remove('error', 'success');
+
             try {
                 const response = await axios.post(`${API_URL}/users/`, userData, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                document.getElementById('create-user-message').textContent = 'Пользователь создан!';
-                document.getElementById('create-user-message').classList.remove('error');
-                document.getElementById('create-user-message').classList.add('success');
+                messageElement.textContent = 'Пользователь создан!';
+                messageElement.classList.add('success');
                 createUserForm.reset();
                 showToast('Пользователь успешно создан', 'success');
                 createUserModal.classList.remove('active');
                 setTimeout(() => createUserModal.style.display = 'none', 300);
                 loadUsers();
             } catch (error) {
-                const errorDetail = error.response?.data?.detail;
-                document.getElementById('create-user-message').textContent = Array.isArray(errorDetail)
-                    ? errorDetail.map(err => `${err.loc.join('.')}: ${err.msg}`).join(', ')
-                    : errorDetail || 'Ошибка создания пользователя';
-                document.getElementById('create-user-message').classList.add('error');
+                const errorDetail = error.response?.data?.detail || 'Ошибка создания пользователя';
+                messageElement.textContent = errorDetail;
+                messageElement.classList.add('error');
+                console.error('Ошибка создания пользователя:', error.response?.data || error);
             }
         });
     } else {
