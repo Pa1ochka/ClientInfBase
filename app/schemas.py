@@ -79,10 +79,32 @@ class ClientUpdate(BaseModel):
     additional_info: Optional[str] = None
     account_number: Optional[str] = None
     department: Optional[DepartmentEnum] = None  # Опционально при обновлении
+    postal_address: Optional[str] = None
 
 class Client(ClientBase):
     id: int
     created_by: int
+
+    class Config:
+        from_attributes = True
+
+
+class ClientFiltered(BaseModel):
+    id: int
+    created_by: int
+    postal_address: Optional[str] = None
+    account_number: Optional[str] = None
+    owner_name: Optional[str] = None
+    phone_number: Optional[str] = None
+    email: Optional[EmailStr] = None
+    connected_power: Optional[float] = None
+    passport_data: Optional[str] = None
+    inn: Optional[str] = None
+    snils: Optional[str] = None
+    connection_date: Optional[date] = None
+    power_source: Optional[str] = None
+    additional_info: Optional[str] = None
+    department: Optional[DepartmentEnum] = None
 
     class Config:
         from_attributes = True

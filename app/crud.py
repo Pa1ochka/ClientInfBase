@@ -140,8 +140,11 @@ Optional[models.Client]:
     if not db_client:
         raise HTTPException(status_code=404, detail=f"Client not found with postal_address: {postal_address}")
 
-    # Если postal_address изменился, проверяем уникальность нового адреса
-    new_postal_address = client.postal_address
+    # Получаем данные клиента из запроса, исключая неуказанные поля
+    client_data = client.dict(exclude_unset=True)
+
+    # Если postal_address передан и отличается от текущего, проверяем уникальность
+    new_postal_address = client_data.get('postal_address')
     if new_postal_address and new_postal_address != postal_address:
         existing_client = get_client_by_address(db, new_postal_address)
         if existing_client:
@@ -149,8 +152,9 @@ Optional[models.Client]:
         db_client.postal_address = new_postal_address
 
     # Обновляем остальные поля
-    for var, value in client.dict(exclude_unset=True, exclude={'postal_address'}).items():
-        setattr(db_client, var, value)
+    for var, value in client_data.items():
+        if var != 'postal_address':  # postal_address уже обработан выше
+            setattr(db_client, var, value)
 
     db.commit()
     db.refresh(db_client)

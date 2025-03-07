@@ -98,36 +98,67 @@
 <!-- Модальное окно редактирования остается без изменений -->
 <div id="edit-user-modal" class="modal">
     <div class="modal-content">
-        <button id="edit-user-close-modal" class="close" aria-label="Закрыть">×</button>
+        <button id="edit-user-close-modal" class="close" aria-label="Закрыть">
+            <span class="material-icons">close</span>
+        </button>
         <header>
-            <h2><span class="material-icons">edit</span> Редактировать пользователя</h2>
+            <h2>
+                <span class="material-icons">edit</span> Редактировать пользователя
+            </h2>
         </header>
         <form id="edit-user-form" class="form">
+            <!-- Основные поля -->
             <div class="input-group">
-                <input type="email" id="edit-user-email" placeholder="Email" required>
-                <span class="material-icons">email</span>
+                <label for="edit-user-email">Email</label>
+                <div class="input-wrapper">
+                    <input type="email" id="edit-user-email" placeholder="Введите email" required>
+                    <span class="material-icons">email</span>
+                    <span class="tooltip">Введите корректный email</span>
+                </div>
             </div>
             <div class="input-group">
-                <input type="text" id="edit-user-username" placeholder="Имя пользователя" required>
-                <span class="material-icons">person</span>
+                <label for="edit-user-username">Имя пользователя</label>
+                <div class="input-wrapper">
+                    <input type="text" id="edit-user-username" placeholder="Введите имя" required>
+                    <span class="material-icons">person</span>
+                    <span class="tooltip">От 3 до 50 символов</span>
+                </div>
             </div>
             <div class="input-group">
-                <input type="password" id="edit-user-password" placeholder="Новый пароль (опционально)">
-                <span class="material-icons">lock</span>
+                <label for="edit-user-password">Новый пароль (опционально)</label>
+                <div class="input-wrapper">
+                    <input type="password" id="edit-user-password" placeholder="Введите новый пароль">
+                    <span class="material-icons">lock</span>
+                    <span class="tooltip">Минимум 8 символов</span>
+                </div>
             </div>
             <div class="input-group">
-                <select id="edit-user-department" required>
-                    <option value="" disabled>Выберите отдел</option>
-                    <option value="YES">ЮЭС</option>
-                    <option value="CES">ЦЭС</option>
-                    <option value="SES">СЭС</option>
-                </select>
-                <span class="material-icons">business</span>
+                <label for="edit-user-department">Отдел</label>
+                <div class="input-wrapper">
+                    <select id="edit-user-department" required>
+                        <option value="" disabled selected>Выберите отдел</option>
+                        <option value="YES">ЮЭС</option>
+                        <option value="CES">ЦЭС</option>
+                        <option value="SES">СЭС</option>
+                    </select>
+                    <span class="material-icons">business</span>
+                    <span class="tooltip">Выберите отдел</span>
+                </div>
             </div>
-            <div class="input-group">
-                <label>Роли и видимые поля клиента:</label>
-                <div id="edit-user-permissions" class="checkbox-group">
-                    <label><input type="checkbox" id="edit-user-is-admin" value="is_admin"> Администратор</label>
+
+            <!-- Роли и видимые поля -->
+            <div class="input-group checkbox-group">
+                <label>Роль пользователя</label>
+                <div class="checkbox-group-inner">
+                    <label>
+                        <input type="checkbox" id="edit-user-is-admin" value="is_admin">
+                        Администратор
+                    </label>
+                </div>
+            </div>
+            <div class="input-group checkbox-group">
+                <label>Видимые поля клиента</label>
+                <div id="edit-client-fields" class="checkbox-group-inner">
                     <label><input type="checkbox" value="phone_number"> Телефон</label>
                     <label><input type="checkbox" value="email"> Email</label>
                     <label><input type="checkbox" value="connected_power"> Подключенная мощность</label>
@@ -139,11 +170,21 @@
                     <label><input type="checkbox" value="additional_info"> Доп. информация</label>
                 </div>
             </div>
+
+            <!-- Поле текущего пароля -->
             <div class="input-group">
-                <input type="password" id="edit-user-current-password" placeholder="Ваш текущий пароль" required>
-                <span class="material-icons">lock</span>
+                <label for="edit-user-current-password">Текущий пароль</label>
+                <div class="input-wrapper">
+                    <input type="password" id="edit-user-current-password" placeholder="Введите текущий пароль" required>
+                    <span class="material-icons">lock</span>
+                    <span class="tooltip">Подтвердите изменения паролем</span>
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary">Сохранить</button>
+
+            <!-- Кнопка сохранения -->
+            <button type="submit" class="btn btn-primary">
+                <span class="material-icons">save</span> Сохранить изменения
+            </button>
         </form>
         <div id="edit-user-message" class="message"></div>
     </div>

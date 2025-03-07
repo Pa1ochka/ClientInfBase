@@ -190,7 +190,7 @@
     border-radius: 16px;
     padding: 30px;
     width: 90%;
-    max-width: 500px;
+    max-width: 550px;
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
@@ -199,7 +199,7 @@
 
 #edit-user-modal header {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 #edit-user-modal h2 {
@@ -217,32 +217,18 @@
     gap: 20px;
 }
 
-#edit-user-form .input-group {
-    position: relative;
-}
-
-#edit-user-form input {
-    width: 100%;
-    padding: 12px 40px 12px 12px;
+#edit-user-form .input-group label {
     font-size: 15px;
-    border: 1px solid #eef2f7;
-    border-radius: 10px;
-    background: #fff;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    color: #2c3e50;
+    font-weight: 500;
+    margin-bottom: 5px;
 }
 
-#edit-user-form input:focus {
-    outline: none;
-    border-color: #3498db;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
-}
-
-#edit-user-form .material-icons {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #7b8794;
+.checkbox-group-inner {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    padding: 10px 0;
 }
 
 #edit-user-form .btn-primary {
@@ -251,7 +237,6 @@
     font-weight: 600;
     border: none;
     border-radius: 12px;
-    cursor: pointer;
     background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
     color: #fff;
     display: flex;

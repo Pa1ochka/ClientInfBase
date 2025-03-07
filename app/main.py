@@ -219,7 +219,7 @@ def read_clients(
     result = crud.get_clients(db, current_user, skip=skip, limit=limit)
     return JSONResponse(status_code=200, content=result)
 
-@app.get("/clients/{postal_address}", response_model=schemas.Client)
+@app.get("/clients/{postal_address}", response_model=schemas.ClientFiltered)
 def read_client(
     postal_address: str,
     db: Session = Depends(get_db),
@@ -232,7 +232,13 @@ def read_client(
         raise HTTPException(status_code=403, detail="Вы не можете просматривать клиентов из других отделов")
 
     # Фильтруем поля
-    visible_fields = current_user.visible_client_fields or schemas.MANDATORY_CLIENT_FIELDS if not current_user.is_admin else schemas.ALL_CLIENT_FIELDS
+    if current_user.is_admin:
+        visible_fields = schemas.ALL_CLIENT_FIELDS
+    else:
+        # Объединяем обязательные поля с видимыми полями пользователя
+        user_fields = current_user.visible_client_fields or []
+        visible_fields = list(set(schemas.MANDATORY_CLIENT_FIELDS + user_fields))
+
     client_dict = schemas.Client.from_orm(client).dict()
     filtered_client = {k: v for k, v in client_dict.items() if k in visible_fields or k in ["id", "created_by"]}
     return filtered_client
@@ -357,6 +363,7 @@ def update_user(
         models.User.username == user.username).first():
         raise HTTPException(status_code=400, detail="Username already taken")
 
+    # Обновляем поля
     db_user.email = user.email
     db_user.username = user.username
     if user.password:
@@ -365,6 +372,11 @@ def update_user(
         db_user.is_admin = user.is_admin
     if user.department:
         db_user.department = user.department
+    # Добавляем обработку visible_client_fields
+    if user.visible_client_fields is not None:  # Обновляем только если поле отправлено
+        if not all(field in schemas.ALL_CLIENT_FIELDS for field in user.visible_client_fields):
+            raise HTTPException(status_code=400, detail="Invalid client field specified")
+        db_user.visible_client_fields = user.visible_client_fields
 
     db.commit()
     db.refresh(db_user)
