@@ -225,23 +225,33 @@ def read_client(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
+    print(f"Получен запрос на клиента: {postal_address}")  # Логируем запрос
+
     client = crud.get_client_by_address(db, postal_address)
     if not client:
+        print("Ошибка: клиент не найден!")
         raise HTTPException(status_code=404, detail="Client not found")
+
+    print(f"Найден клиент: {client}")
+
     if not current_user.is_admin and client.department != current_user.department:
+        print("Ошибка: доступ запрещен!")
         raise HTTPException(status_code=403, detail="Вы не можете просматривать клиентов из других отделов")
 
-    # Фильтруем поля
+    # Формируем список полей
     if current_user.is_admin:
         visible_fields = schemas.ALL_CLIENT_FIELDS
     else:
-        # Объединяем обязательные поля с видимыми полями пользователя
         user_fields = current_user.visible_client_fields or []
         visible_fields = list(set(schemas.MANDATORY_CLIENT_FIELDS + user_fields))
 
     client_dict = schemas.Client.from_orm(client).dict()
     filtered_client = {k: v for k, v in client_dict.items() if k in visible_fields or k in ["id", "created_by"]}
+
+    print(f"Отправляем клиентские данные: {filtered_client}")  # Логируем ответ
+
     return filtered_client
+
 
 @app.put("/clients/{postal_address}", response_model=schemas.Client)
 def update_client(

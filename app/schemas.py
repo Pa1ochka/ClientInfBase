@@ -8,7 +8,7 @@ class DepartmentEnum(str, Enum):
     CES = "CES"
     SES = "SES"
 
-MANDATORY_CLIENT_FIELDS = ["postal_address", "account_number", "owner_name", "department"]
+MANDATORY_CLIENT_FIELDS = ["postal_address", "account_number", "owner_name", "department", "email"]
 
 # Все возможные поля клиента
 ALL_CLIENT_FIELDS = [
