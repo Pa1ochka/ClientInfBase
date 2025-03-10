@@ -119,13 +119,17 @@ async function loadClients(searchTerm = '', connectionDate = null, powerMin = nu
 
         if (tableBody) {
             clients.forEach((client, index) => {
+                // Объявляем phoneNumbers только один раз внутри итерации
+                const phoneNumbers = client.phone_number.split(';');
+                const firstPhone = phoneNumbers[0]; // Берем только первый номер
+
                 const row = document.createElement('tr');
                 row.style.setProperty('--row-index', index);
                 row.innerHTML = `
                     <td>${client.postal_address}</td>
                     <td>${client.owner_name}</td>
                     <td>${client.email}</td>
-                    <td>${client.phone_number}</td>
+                    <td>${firstPhone}</td> <!-- Отображаем только первый номер -->
                     <td>${client.inn}</td>
                     <td>
                         ${isAdmin ? `<button class="btn btn-edit" onclick="editClient('${encodeURIComponent(client.postal_address)}')"><span class="material-icons">edit</span></button>` : ''}
@@ -249,7 +253,6 @@ async function editClient(postalAddress) {
             'edit-client-owner-name': client.owner_name || '',
             'edit-client-department': client.department || '',
             'edit-client-email': client.email || '',
-            'edit-client-phone-number': client.phone_number || '',
             'edit-client-inn': client.inn || '',
             'edit-client-connected-power': client.connected_power !== null ? client.connected_power : '',
             'edit-client-passport-data': client.passport_data || '',
@@ -275,6 +278,34 @@ async function editClient(postalAddress) {
             message.textContent = '';
             message.classList.remove('error', 'success');
         }
+
+        // Заполняем номера телефона
+        const phoneList = document.getElementById('edit-client-phone-list');
+        phoneList.innerHTML = '';
+        const phoneNumbers = client.phone_number.split(';');
+        phoneNumbers.forEach((number, index) => {
+            const phoneWrapper = document.createElement('div');
+            phoneWrapper.className = 'phone-input-wrapper';
+            phoneWrapper.innerHTML = `
+                <input type="text" class="phone-input" value="${number}" maxlength="12" required>
+                <span class="material-icons">phone</span>
+                <button type="button" class="remove-phone btn btn-danger" style="${index === 0 ? 'display: none;' : ''}">
+                    <span class="material-icons">delete</span>
+                </button>
+            `;
+            phoneList.appendChild(phoneWrapper);
+            const phoneInput = phoneWrapper.querySelector('.phone-input');
+            phoneInput.addEventListener('input', enforcePhoneFormat);
+            phoneWrapper.querySelector('.remove-phone').addEventListener('click', () => {
+                if (phoneList.children.length > 1) {
+                    phoneList.removeChild(phoneWrapper);
+                }
+            });
+        });
+
+        document.getElementById('add-phone-edit').addEventListener('click', () => {
+            addPhoneInput('edit-client-phone-list');
+        });
 
         const editForm = document.getElementById('edit-client-form');
         if (!editForm) {
@@ -364,13 +395,15 @@ async function editClient(postalAddress) {
 
             const updatedPostalAddress = document.getElementById('edit-client-postal-address').value;
             const connectionDate = document.getElementById('edit-client-connection-date').value;
+            const phoneInputs = document.querySelectorAll('#edit-client-phone-list .phone-input');
+            const phoneNumbers = Array.from(phoneInputs).map(input => input.value);
             const clientData = {
-                postal_address: updatedPostalAddress,  // Отправляем новый адрес
+                postal_address: updatedPostalAddress,
                 account_number: document.getElementById('edit-client-account-number').value,
                 owner_name: document.getElementById('edit-client-owner-name').value,
                 department: document.getElementById('edit-client-department').value,
                 email: document.getElementById('edit-client-email').value,
-                phone_number: document.getElementById('edit-client-phone-number').value,
+                phone_number: phoneNumbers.join(';'),
                 inn: document.getElementById('edit-client-inn').value,
                 connected_power: parseFloat(document.getElementById('edit-client-connected-power').value) || null,
                 passport_data: document.getElementById('edit-client-passport-data').value || null,

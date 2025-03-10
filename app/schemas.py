@@ -52,7 +52,7 @@ class ClientBase(BaseModel):
     postal_address: str = Field(..., min_length=5, max_length=200)
     account_number: str = Field(..., min_length=1, max_length=50)
     owner_name: str = Field(..., min_length=1, max_length=100)
-    phone_number: str = Field(..., min_length=5, max_length=20)
+    phone_number: str = Field(..., min_length=5, max_length=100)
     email: EmailStr
     connected_power: Optional[float] = None
     passport_data: Optional[str] = Field(None, max_length=50)

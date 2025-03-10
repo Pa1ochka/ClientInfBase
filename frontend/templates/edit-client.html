@@ -35,10 +35,21 @@
                 <span class="material-icons">email</span>
                 <span class="tooltip">Корректный email</span>
             </div>
-            <div class="input-group">
-                <input type="text" id="edit-client-phone-number" placeholder="Телефон" required>
-                <span class="material-icons">phone</span>
-                <span class="tooltip">От 5 до 20 символов</span>
+            <div class="input-group phone-group">
+                <label>Номера телефона</label>
+                <div id="edit-client-phone-list" class="phone-list">
+                    <div class="phone-input-wrapper">
+                        <input type="text" class="phone-input" placeholder="+7" value="+7" maxlength="12" required>
+                        <span class="material-icons">phone</span>
+                        <button type="button" class="remove-phone btn btn-danger" style="display: none;">
+                            <span class="material-icons">delete</span>
+                        </button>
+                    </div>
+                </div>
+                <button type="button" id="add-phone-edit" class="btn btn-secondary">
+                    <span class="material-icons">add</span> Добавить номер
+                </button>
+                <span class="tooltip">Формат: +7XXXXXXXXXX (10 цифр после +7)</span>
             </div>
             <div class="input-group">
                 <input type="text" id="edit-client-inn" placeholder="ИНН" required>

@@ -88,12 +88,14 @@ document.getElementById('create-client-form').addEventListener('submit', async (
 
     const connectionDate = document.getElementById('create-client-connection-date').value;
     const postalAddress = document.getElementById('create-client-postal-address').value;
+    const phoneInputs = document.querySelectorAll('#create-client-phone-list .phone-input');
+    const phoneNumbers = Array.from(phoneInputs).map(input => input.value);
     const clientData = {
         postal_address: postalAddress,
         account_number: document.getElementById('create-client-account-number').value,
         owner_name: document.getElementById('create-client-owner-name').value,
         email: document.getElementById('create-client-email').value,
-        phone_number: document.getElementById('create-client-phone-number').value,
+        phone_number: phoneNumbers.join(';'),
         inn: document.getElementById('create-client-inn').value,
         connected_power: parseFloat(document.getElementById('create-client-connected-power').value) || null,
         passport_data: document.getElementById('create-client-passport-data').value || null,
@@ -115,6 +117,8 @@ document.getElementById('create-client-form').addEventListener('submit', async (
             message.classList.remove('error');
             message.classList.add('success');
             document.getElementById('create-client-form').reset();
+            document.getElementById('create-client-form').reset();
+            resetPhoneList('create-client-phone-list');
             loadClients();
             showToast('Клиент успешно создан', 'success');
         } catch (error) {
@@ -148,6 +152,11 @@ document.getElementById('create-client-form').addEventListener('submit', async (
             message.classList.add('error');
         }
     });
+
+    // Добавление нового номера телефона
+    document.getElementById('add-phone-create').addEventListener('click', () => {
+        addPhoneInput('create-client-phone-list');
+    });
 }
 
 function validateClientForm() {
@@ -162,7 +171,7 @@ function validateClientForm() {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const innRegex = /^\d{10,12}$/;
-    const phoneRegex = /^\+?\d{5,20}$/;
+    const phoneRegex = /^\+7\d{10}$/;
     const cadastralRegex = /^[0-9]{2}:[0-9]{2}:[0-9]{6,7}:[0-9]+$/;
     const simpleIdRegex = /^[A-Za-z0-9-]{5,50}$/;
 
@@ -176,10 +185,12 @@ function validateClientForm() {
         message.classList.add('error');
         return false;
     }
-    if (!phoneRegex.test(phone)) {
-        message.textContent = 'Телефон должен содержать от 5 до 20 цифр (можно с + в начале)';
-        message.classList.add('error');
-        return false;
+    for (let phone of phoneInputs) {
+        if (!phoneRegex.test(phone.value)) {
+            message.textContent = 'Телефон должен быть в формате +7XXXXXXXXXX (10 цифр после +7)';
+            message.classList.add('error');
+            return false;
+        }
     }
     if (useIdentifier) {
         if (!cadastralRegex.test(postalAddress) && !simpleIdRegex.test(postalAddress)) {
@@ -196,4 +207,68 @@ function validateClientForm() {
         }
     }
     return true;
+}
+
+// Функция добавления нового поля телефона
+function addPhoneInput(listId) {
+    const phoneList = document.getElementById(listId);
+    const phoneWrapper = document.createElement('div');
+    phoneWrapper.className = 'phone-input-wrapper';
+    phoneWrapper.innerHTML = `
+        <input type="text" class="phone-input" placeholder="+7" value="+7" maxlength="12" required>
+        <span class="material-icons">phone</span>
+        <button type="button" class="remove-phone btn btn-danger">
+            <span class="material-icons">delete</span>
+        </button>
+    `;
+    phoneList.appendChild(phoneWrapper);
+
+    const phoneInput = phoneWrapper.querySelector('.phone-input');
+    phoneInput.addEventListener('input', enforcePhoneFormat);
+
+    const removeBtn = phoneWrapper.querySelector('.remove-phone');
+    removeBtn.addEventListener('click', () => {
+        if (phoneList.children.length > 1) {
+            phoneList.removeChild(phoneWrapper);
+        }
+    });
+
+    updateRemoveButtons(listId);
+}
+
+// Принудительное форматирование номера телефона
+function enforcePhoneFormat(event) {
+    const input = event.target;
+    let value = input.value.replace(/[^\d+]/g, '');
+    if (!value.startsWith('+7')) {
+        value = '+7' + value.replace(/^\+7/, '');
+    }
+    if (value.length > 12) {
+        value = value.slice(0, 12);
+    }
+    input.value = value;
+}
+
+// Обновление видимости кнопок удаления
+function updateRemoveButtons(listId) {
+    const phoneList = document.getElementById(listId);
+    const removeButtons = phoneList.querySelectorAll('.remove-phone');
+    removeButtons.forEach(btn => {
+        btn.style.display = phoneList.children.length > 1 ? 'inline-flex' : 'none';
+    });
+}
+
+// Сброс списка номеров
+function resetPhoneList(listId) {
+    const phoneList = document.getElementById(listId);
+    phoneList.innerHTML = `
+        <div class="phone-input-wrapper">
+            <input type="text" class="phone-input" placeholder="+7" value="+7" maxlength="12" required>
+            <span class="material-icons">phone</span>
+            <button type="button" class="remove-phone btn btn-danger" style="display: none;">
+                <span class="material-icons">delete</span>
+            </button>
+        </div>
+    `;
+    phoneList.querySelector('.phone-input').addEventListener('input', enforcePhoneFormat);
 }
